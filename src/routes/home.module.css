@@ -60,15 +60,34 @@
   gap: 12px;
 }
 
-.foot {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-2);
+.statusBand {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.foot p {
-  font-size: 12px;
-  color: var(--dim);
+.statusText {
+  font-size: 14px;
+  color: var(--muted);
   line-height: 1.55;
   margin: 0;
+}
+
+.retryLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--gold-border);
+}
+
+.retryLink:hover {
+  color: var(--text);
+  text-decoration-color: var(--muted);
 }

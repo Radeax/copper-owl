@@ -119,3 +119,22 @@
   color: var(--muted);
   line-height: 1.55;
 }
+
+.modeWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* When expanded, square off the button's bottom corners so the panel connects */
+.modeRecommendedOpen {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-bottom-color: transparent;
+}
+
+.keyEntryPanel {
+  background: linear-gradient(135deg, var(--gold-soft) 0%, var(--bg-3) 60%);
+  border: 1px solid var(--gold-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 0 18px 18px;
+}

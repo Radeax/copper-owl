@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { ApiKeyEntry } from '@/components/auth/ApiKeyEntry';
 import styles from './welcome.module.css';
 
 export const Route = createFileRoute('/welcome')({
@@ -7,6 +9,7 @@ export const Route = createFileRoute('/welcome')({
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const [showKeyEntry, setShowKeyEntry] = useState(false);
 
   return (
     <div className={styles.page}>
@@ -36,17 +39,25 @@ function WelcomePage() {
           </div>
         </button>
 
-        <button
-          className={`${styles.mode} ${styles.modeRecommended}`}
-          onClick={() => navigate({ to: '/home' })}
-        >
-          <div className={styles.modeEyebrow}>Recommended · API key</div>
-          <div className={styles.modeTitle}>Paste a read-only API key</div>
-          <div className={styles.modeDesc}>
-            Get personalized recommendations based on your account. Generated at
-            account.arena.net, read-only, stays on your device.
-          </div>
-        </button>
+        <div className={styles.modeWrapper}>
+          <button
+            className={`${styles.mode} ${styles.modeRecommended}${showKeyEntry ? ` ${styles.modeRecommendedOpen}` : ''}`}
+            onClick={() => setShowKeyEntry((s) => !s)}
+            aria-expanded={showKeyEntry}
+          >
+            <div className={styles.modeEyebrow}>Recommended · API key</div>
+            <div className={styles.modeTitle}>Paste a read-only API key</div>
+            <div className={styles.modeDesc}>
+              Get personalized recommendations based on your account. Generated at
+              account.arena.net, read-only, stays on your device.
+            </div>
+          </button>
+          {showKeyEntry && (
+            <div className={styles.keyEntryPanel}>
+              <ApiKeyEntry onSuccess={() => navigate({ to: '/home' })} />
+            </div>
+          )}
+        </div>
 
         <button
           className={styles.mode}

@@ -1,0 +1,97 @@
+.form {
+  padding: 16px 0 4px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.input::placeholder {
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+}
+
+.input:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 0 2px var(--gold-soft);
+}
+
+.inputError {
+  border-color: var(--amber-border);
+}
+
+.inputError:focus {
+  border-color: var(--amber-border);
+  box-shadow: 0 0 0 2px var(--amber-soft);
+}
+
+.connectBtn {
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.connectBtn:hover:not(:disabled) {
+  background: rgba(224, 173, 85, 0.22);
+  border-color: var(--gold);
+}
+
+.connectBtn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--amber);
+  line-height: 1.5;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.6;
+}
+
+.hintLink {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--border);
+  transition: color 0.12s;
+}
+
+.hintLink:hover {
+  color: var(--text);
+  text-decoration-color: var(--muted);
+}
