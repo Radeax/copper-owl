@@ -7,7 +7,7 @@ import path from 'node:path';
 // @ts-expect-error process.env is available in Vite's Node context
 const host = process.env.TAURI_DEV_HOST;
 
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [
     // TanStack Router file-based routing — generates routeTree.gen.ts from src/routes
     TanStackRouterVite({
@@ -114,4 +114,4 @@ export default defineConfig(async () => ({
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
-}));
+});
