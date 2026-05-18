@@ -18,7 +18,6 @@ import './engine/rules/example';
 // dependency isn't present.
 async function loadPrivateRules(): Promise<void> {
   try {
-    // @ts-expect-error optional dep — present only in authenticated builds
     await import('@copper-owl/rules');
   } catch {
     // Private package not installed — the example rules registered above

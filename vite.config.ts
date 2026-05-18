@@ -4,7 +4,6 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
-// @ts-expect-error process.env is available in Vite's Node context
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
