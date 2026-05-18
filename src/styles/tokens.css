@@ -1,0 +1,134 @@
+/*
+ * Copper Owl design tokens — the canonical source of truth for colors, fonts,
+ * and spacing. Derived from the mature prototype design system built over many
+ * iterations (see docs/voice-and-design.md). Every value here was chosen
+ * deliberately; do not change without checking the WCAG audit and the painted
+ * SVG library that references these tokens.
+ */
+
+:root {
+  /* ─── Surfaces (warm-shifted near-neutrals) ─── */
+  --bg: #131312;
+  --bg-2: #1c1c1b;
+  --bg-3: #252524;
+  --bg-4: #0c0c0b;
+
+  /* ─── Borders ─── */
+  --border: #2e2e2c;
+  --border-2: #1f1f1d;
+
+  /* ─── Text (WCAG AA passing on every surface above) ─── */
+  --text: #e8e6df; /* 12-15 ratio everywhere — AAA */
+  --muted: #a39e94; /* 5.75-7.34 — AA */
+  --dim: #928d85; /* 4.65-5.94 — AA, lifted from #6f6a64 during contrast audit */
+  --dimmer: #857f78; /* 3.71-4.74 — AA-large, used for decorative borders */
+
+  /* ─── Accent: warm anchor ─── */
+  --gold: #e0ad55;
+  --gold-soft: rgba(224, 173, 85, 0.14);
+  --gold-border: rgba(224, 173, 85, 0.32);
+
+  /* ─── Accent: cool counter-tone ─── */
+  --aether: #7dd3c0;
+  --aether-soft: rgba(125, 211, 192, 0.1);
+  --aether-border: rgba(125, 211, 192, 0.22);
+
+  /* ─── Auxiliary accents ─── */
+  --blue: #7aa3c0;
+  --blue-soft: rgba(122, 163, 192, 0.1);
+  --blue-border: rgba(122, 163, 192, 0.22);
+
+  --green: #7ab57e;
+  --green-soft: rgba(122, 181, 126, 0.1);
+  --green-border: rgba(122, 181, 126, 0.24);
+
+  --purple: #b08acc;
+  --purple-soft: rgba(176, 138, 204, 0.1);
+  --purple-border: rgba(176, 138, 204, 0.24);
+
+  --amber: #d4a574;
+  --amber-soft: rgba(212, 165, 116, 0.1);
+  --amber-border: rgba(212, 165, 116, 0.22);
+
+  /* ─── Rarity tokens (GW2 conventional colors) ─── */
+  --rarity-fine: #62a4da;
+  --rarity-masterwork: #1a9306;
+  --rarity-rare: #fcd00b;
+  --rarity-exotic: #ffa405;
+  --rarity-ascended: #fb3e8d;
+  --rarity-legendary: #a335ee;
+
+  /* ─── Typography ─── */
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ─── Layout ─── */
+  --radius: 11px;
+  --radius-lg: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ─── Global resets ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* ─── Dual-tone atmospheric backdrop ─── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 380px;
+  background: radial-gradient(
+    ellipse 60% 100% at 50% 0%,
+    rgba(224, 173, 85, 0.06) 0%,
+    rgba(224, 173, 85, 0.02) 35%,
+    rgba(125, 211, 192, 0.025) 65%,
+    transparent 90%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: radial-gradient(
+    ellipse 70% 100% at 50% 100%,
+    rgba(125, 211, 192, 0.025) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+}

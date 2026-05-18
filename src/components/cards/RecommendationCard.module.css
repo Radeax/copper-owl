@@ -1,0 +1,100 @@
+.card {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.primary {
+  background: linear-gradient(135deg, var(--gold-soft) 0%, var(--bg-3) 60%);
+  border-color: var(--gold-border);
+}
+
+.alternative {
+  background: var(--bg-3);
+  border-color: var(--border);
+}
+
+.fallback {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.primary .eyebrow {
+  color: var(--gold);
+}
+
+.fallback .eyebrow {
+  color: var(--dimmer);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--text);
+}
+
+.fallback .title {
+  color: var(--muted);
+}
+
+.detail {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0;
+}
+
+.flavor {
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--dim);
+  margin: 0;
+  border-left: 2px solid var(--border);
+  padding: 2px 0 2px 12px;
+}
+
+.primary .flavor {
+  border-left-color: var(--gold-border);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: var(--bg-4);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  padding: 3px 7px;
+}

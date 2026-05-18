@@ -1,0 +1,80 @@
+{
+  "name": "copper-owl",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Decision-support companion for Guild Wars 2 — tells players what to do next, why it matters, and what to skip. Information layer over the public GW2 API.",
+  "license": "MIT",
+  "exports": {
+    "./types": "./src/types/domain.ts",
+    "./engine/rules": "./src/engine/rules/registry.ts",
+    "./engine/rules/types": "./src/engine/rules/types.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:android:init": "tauri android init",
+    "tauri:android:dev": "tauri android dev",
+    "tauri:android:build": "tauri android build",
+    "tauri:ios:init": "tauri ios init",
+    "tauri:ios:dev": "tauri ios dev",
+    "tauri:ios:build": "tauri ios build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --max-warnings=0",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,md}\"",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "@base-ui-components/react": "^1.0.0-beta.3",
+    "@tanstack/react-query": "^5.62.0",
+    "@tanstack/react-router": "^1.95.0",
+    "@xstate/react": "^5.0.0",
+    "idb-keyval": "^6.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "xstate": "^5.19.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.62.0",
+    "@tanstack/react-router-devtools": "^1.95.0",
+    "@tanstack/router-plugin": "^1.95.0",
+    "@tauri-apps/api": "^2.1.0",
+    "@tauri-apps/cli": "^2.1.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^2.1.8",
+    "babel-plugin-react-compiler": "^19.0.0-beta-37ed2a7-20241206",
+    "eslint": "^9.16.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-37ed2a7-20241206",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "happy-dom": "^15.11.7",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.18.0",
+    "vite": "^6.0.3",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "optionalDependencies": {
+    "@copper-owl/rules": "*"
+  }
+}
