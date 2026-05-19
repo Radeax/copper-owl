@@ -129,5 +129,10 @@ describe('transformGW2Account', () => {
       const result = transformGW2Account(BASE_ACCOUNT, []);
       expect(result.masteries).toBeNull();
     });
+
+    it('pursuingGoal is always null (not derivable from API yet)', () => {
+      const result = transformGW2Account(BASE_ACCOUNT, []);
+      expect(result.pursuingGoal).toBeNull();
+    });
   });
 });

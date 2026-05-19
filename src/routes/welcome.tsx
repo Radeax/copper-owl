@@ -30,12 +30,12 @@ function WelcomePage() {
 
         <button
           className={styles.mode}
-          onClick={() => navigate({ to: '/orientation' })}
+          onClick={() => navigate({ to: '/start' })}
         >
           <div className={styles.modeEyebrow}>Anonymous</div>
           <div className={styles.modeTitle}>Browse without connecting</div>
           <div className={styles.modeDesc}>
-            Pick your profile manually. No account, no API key, no tracking.
+            Pick a profile manually. No account, no API key, no tracking.
           </div>
         </button>
 

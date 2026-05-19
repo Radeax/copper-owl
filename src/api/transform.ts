@@ -49,5 +49,6 @@ export function transformGW2Account(
     })),
     wallet: {},
     masteries: null,
+    pursuingGoal: null,
   };
 }

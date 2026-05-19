@@ -55,6 +55,13 @@ export interface AccountState {
   wallet: Record<string, number>;
   /** Mastery completion summary */
   masteries: MasterySummary | null;
+  /**
+   * Whether the player is pursuing a specific long-term goal.
+   * - `null` for API-derived state — cannot be inferred from public endpoints yet.
+   * - `true` / `false` only set by anonymous-mode self-classification.
+   * The classifier promotes engaged → engaged_committed when this is `true`.
+   */
+  pursuingGoal: boolean | null;
 }
 
 export interface CharacterSummary {

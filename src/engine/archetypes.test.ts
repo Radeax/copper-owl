@@ -24,6 +24,7 @@ const baseAccount = (overrides: Partial<AccountState> = {}): AccountState => ({
   ],
   wallet: {},
   masteries: null,
+  pursuingGoal: null,
   ...overrides,
 });
 
@@ -64,6 +65,29 @@ describe('classifyArchetype', () => {
   it('returning takes priority over fresh_80 even with max-level characters', () => {
     const account = baseAccount({ daysSinceLastLogin: 200 });
     expect(classifyArchetype(account)).toBe('returning');
+  });
+
+  it('returns "engaged_committed" when an engaged player has pursuingGoal=true', () => {
+    const account = baseAccount({ daysSinceLastLogin: 5, pursuingGoal: true });
+    expect(classifyArchetype(account)).toBe('engaged_committed');
+  });
+
+  it('falls back to "engaged_casual" when pursuingGoal is null or false', () => {
+    expect(
+      classifyArchetype(baseAccount({ daysSinceLastLogin: 5, pursuingGoal: null }))
+    ).toBe('engaged_casual');
+    expect(
+      classifyArchetype(baseAccount({ daysSinceLastLogin: 5, pursuingGoal: false }))
+    ).toBe('engaged_casual');
+  });
+
+  it('pursuingGoal=true does not override returning or fresh_80 classification', () => {
+    expect(
+      classifyArchetype(baseAccount({ daysSinceLastLogin: 90, pursuingGoal: true }))
+    ).toBe('returning');
+    expect(
+      classifyArchetype(baseAccount({ daysSinceLastLogin: 30, pursuingGoal: true }))
+    ).toBe('fresh_80');
   });
 
   it('f2p_explorer takes priority over returning when no expansions owned', () => {
