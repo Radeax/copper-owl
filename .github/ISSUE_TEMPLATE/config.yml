@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  # - name: Discord (when one exists)
+  #   url: 
+  #   about: Casual questions and discussion.
+  - name: GW2 official API documentation
+    url: https://wiki.guildwars2.com/wiki/API:Main
+    about: Reference for endpoints and rate limits.
