@@ -28,6 +28,10 @@ src-tauri/target/
 src-tauri/gen/
 src-tauri/Cargo.lock
 
+# TypeScript declaration files emitted by tsc -b (composite project build artifact)
+**/*.d.ts
+!src/vite-env.d.ts
+
 # TypeScript incremental build cache
 *.tsbuildinfo
 

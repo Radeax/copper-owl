@@ -12,4 +12,7 @@ pnpm lint
 echo "==> test"
 pnpm test:run
 
+echo "==> build"
+pnpm build
+
 echo "==> All checks passed."

@@ -13,12 +13,13 @@ import './styles/tokens.css';
 import './engine/rules/example';
 
 // Optional load of the private rule package. Wrapped in try/catch so the
-// public engine works for anyone who clones the repo without authenticated
-// access to the rules registry. Vite tree-shakes this in builds where the
-// dependency isn't present.
+// public engine works for anyone who clones the repo without the private
+// package installed. The /* @vite-ignore */ comment tells Rollup not to
+// attempt bundle-time resolution — without it the build fails even though
+// the runtime try/catch would handle absence correctly.
 async function loadPrivateRules(): Promise<void> {
   try {
-    await import('@copper-owl/rules');
+    await import(/* @vite-ignore */ '@copper-owl/rules');
   } catch {
     // Private package not installed — the example rules registered above
     // remain in effect. This is the expected path for public/contributor
