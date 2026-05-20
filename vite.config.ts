@@ -2,17 +2,40 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
+
+// When @copper-owl/rules isn't installed (CI, external clones), Rollup fails
+// at bundle time trying to resolve the dynamic import in main.tsx — the
+// try/catch only handles runtime absence, not build-time resolution failures.
+// This stub resolves the import to an empty virtual module so the build
+// succeeds; no registerRuleSet calls are made, so placeholder rules stay.
+const rulesInstalled = existsSync('./node_modules/@copper-owl/rules');
+const optionalRulesStub = rulesInstalled
+  ? null
+  : {
+      name: 'stub-optional-rules',
+      resolveId(id: string) {
+        if (id === '@copper-owl/rules') return '\0copper-owl-rules-stub';
+      },
+      load(id: string) {
+        if (id === '\0copper-owl-rules-stub') return 'export {};';
+      },
+    };
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
   plugins: [
+    ...(optionalRulesStub ? [optionalRulesStub] : []),
     // TanStack Router file-based routing — generates routeTree.gen.ts from src/routes
     TanStackRouterVite({
       routesDirectory: 'src/routes',
       generatedRouteTree: 'src/routeTree.gen.ts',
       autoCodeSplitting: true,
+      // tsc -b emits .d.ts files into src/routes/ as a composite build
+      // side-effect. Without this, the plugin picks them up as route files.
+      routeFileIgnorePattern: '\\.d\\.ts$',
     }),
     // React 19 with React Compiler enabled
     react({
