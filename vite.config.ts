@@ -33,6 +33,9 @@ export default defineConfig({
       routesDirectory: 'src/routes',
       generatedRouteTree: 'src/routeTree.gen.ts',
       autoCodeSplitting: true,
+      // tsc -b emits .d.ts files into src/routes/ as a composite build
+      // side-effect. Without this, the plugin picks them up as route files.
+      routeFileIgnorePattern: '\\.d\\.ts$',
     }),
     // React 19 with React Compiler enabled
     react({
