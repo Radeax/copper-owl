@@ -13,6 +13,7 @@ Format follows the [Michael Nygard ADR template](https://github.com/joelparkerhe
 | [0003](./0003-name-history.md) | Project name — Copper Owl | Accepted |
 | [0004](./0004-claude-model-defaults.md) | Claude model defaults per repository | Accepted |
 | [0005](./0005-cloudflare-pages-hosting.md) | Cloudflare Pages for web hosting | Accepted |
+| [0006](./0006-public-repo-standalone-installable.md) | Public repo is standalone-installable; rules are a runtime concern | Accepted |
 
 ## When to write a new ADR
 
