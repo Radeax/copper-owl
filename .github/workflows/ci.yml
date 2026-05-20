@@ -30,9 +30,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-workspace
 
-      - name: Generate TanStack Router route tree
-        run: pnpm exec tsr generate
-
       - name: Typecheck
         run: pnpm typecheck
 
