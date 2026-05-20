@@ -12,14 +12,12 @@ import './styles/tokens.css';
 // effect calls registerRuleSet() and overrides the example placeholders.
 import './engine/rules/example';
 
-// Optional load of the private rule package. Wrapped in try/catch so the
-// public engine works for anyone who clones the repo without the private
-// package installed. The /* @vite-ignore */ comment tells Rollup not to
-// attempt bundle-time resolution — without it the build fails even though
-// the runtime try/catch would handle absence correctly.
+// Optional load of the private rule package. When @copper-owl/rules isn't
+// installed, vite.config.ts stubs the module so Rollup can resolve the import
+// at build time. The try/catch handles any remaining runtime failures.
 async function loadPrivateRules(): Promise<void> {
   try {
-    await import(/* @vite-ignore */ '@copper-owl/rules');
+    await import('@copper-owl/rules');
   } catch {
     // Private package not installed — the example rules registered above
     // remain in effect. This is the expected path for public/contributor
