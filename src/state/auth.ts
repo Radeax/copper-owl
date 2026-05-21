@@ -22,7 +22,7 @@ import type {
 
 export type ExpansionFlags = AccountState['expansions'];
 
-export const NO_EXPANSIONS: ExpansionFlags = Object.freeze({
+export const NO_EXPANSIONS: Readonly<ExpansionFlags> = Object.freeze({
   hot: false,
   pof: false,
   eod: false,
@@ -31,7 +31,7 @@ export const NO_EXPANSIONS: ExpansionFlags = Object.freeze({
   voe: false,
 });
 
-export const ALL_EXPANSIONS: ExpansionFlags = Object.freeze({
+export const ALL_EXPANSIONS: Readonly<ExpansionFlags> = Object.freeze({
   hot: true,
   pof: true,
   eod: true,
@@ -79,7 +79,9 @@ export function buildSyntheticAccountState(profile: AnonymousProfile): AccountSt
     name: null,
     ageDays: null,
     daysSinceLastLogin: profile.daysSinceLastLogin,
-    expansions: profile.expansions,
+    // Copy so a frozen constant (NO_/ALL_EXPANSIONS) never flows into
+    // engine state as a shared, in-place-mutable reference.
+    expansions: { ...profile.expansions },
     characters,
     wallet: {},
     masteries: null,

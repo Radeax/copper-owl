@@ -39,6 +39,20 @@ describe('buildSyntheticAccountState', () => {
     expect(classifyArchetype(buildSyntheticAccountState(profile))).toBe('fresh_80');
   });
 
+  it('fresh_80 profile with no expansions classifies as f2p_explorer (start.tsx blocks this combination)', () => {
+    // Selecting the "Fresh at level 80" card with every expansion unchecked
+    // would store archetype 'fresh_80' but classify as 'f2p_explorer' — the
+    // stored and derived archetypes disagree. start.tsx disables Continue in
+    // this state; this pins the classifier behavior the guard exists for.
+    const profile: AnonymousProfile = {
+      archetype: 'fresh_80',
+      expansions: NO_EXPANSIONS,
+      daysSinceLastLogin: 30,
+      hasMaxLevel: true,
+    };
+    expect(classifyArchetype(buildSyntheticAccountState(profile))).toBe('f2p_explorer');
+  });
+
   it('returning profile classifies back to returning at each gap bucket', () => {
     for (const gap of [90, 365, 700]) {
       const profile: AnonymousProfile = {

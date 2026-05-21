@@ -67,6 +67,20 @@ const GAP_BUCKETS: ReadonlyArray<{ value: GapBucket; main: string; meta: string 
   { value: 700, main: 'Over 1.5 years', meta: 'Several expansions and seasonal cycles to reorient' },
 ];
 
+/** True when at least one expansion flag is set. */
+function hasAnyExpansion(flags: ExpansionFlags): boolean {
+  return Object.values(flags).some(Boolean);
+}
+
+/**
+ * Narrow a persisted daysSinceLastLogin back to a gap bucket. Returns null
+ * for any value that isn't an exact bucket — a corrupted or older persisted
+ * profile must not seed the radio group with an unselectable value.
+ */
+function toGapBucket(value: number | undefined): GapBucket | null {
+  return GAP_BUCKETS.some((b) => b.value === value) ? (value as GapBucket) : null;
+}
+
 // ─── Page component ────────────────────────────────────────────────
 function StartPage() {
   const navigate = useNavigate();
@@ -101,10 +115,10 @@ function StartPage() {
     seed('fresh')?.expansions ?? { ...NO_EXPANSIONS, hot: true, pof: true }
   );
   const [gap, setGap] = useState<GapBucket | null>(
-    (seed('returning')?.daysSinceLastLogin as GapBucket | undefined) ?? null
+    toGapBucket(seed('returning')?.daysSinceLastLogin)
   );
   const [activeExpansions, setActiveExpansions] = useState<ExpansionFlags>(
-    seed('active')?.expansions ?? ALL_EXPANSIONS
+    seed('active')?.expansions ?? { ...ALL_EXPANSIONS }
   );
   const [pursuingGoal, setPursuingGoal] = useState<boolean | null>(
     seed('active')?.pursuingGoal ?? null
@@ -142,6 +156,10 @@ function StartPage() {
   function buildProfileFromForm(): AnonymousProfile | null {
     switch (selected) {
       case 'fresh':
+        // A fresh_80 profile with no expansions classifies as f2p_explorer,
+        // contradicting the stored archetype. Require at least one expansion
+        // — this also disables Continue via canSubmit.
+        if (!hasAnyExpansion(freshExpansions)) return null;
         return {
           archetype: 'fresh_80',
           expansions: freshExpansions,
@@ -322,7 +340,11 @@ function FreshFollowup({ expansions, onToggle }: ExpansionGridProps) {
   return (
     <FollowupBlock
       label="Which expansions are unlocked?"
-      hint="Path of Fire includes Heart of Thorns automatically."
+      hint={
+        hasAnyExpansion(expansions)
+          ? 'Path of Fire includes Heart of Thorns automatically.'
+          : 'With no expansions unlocked, the free account starting point is the closer fit.'
+      }
     >
       <ExpansionGrid expansions={expansions} onToggle={onToggle} />
     </FollowupBlock>
