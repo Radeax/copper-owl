@@ -5,7 +5,7 @@ import reactCompiler from 'eslint-plugin-react-compiler';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'src-tauri/target', 'src/routeTree.gen.ts'] },
+  { ignores: ['dist', 'src-tauri/target', 'src/routeTree.gen.ts', '**/*.d.ts'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

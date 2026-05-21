@@ -68,6 +68,29 @@ When a recommendation references mechanics, items, or schedules, link to the can
 
 ✅ Sources field on a recommendation: `[{label: 'Event timers', url: 'https://wiki.guildwars2.com/wiki/Event_timers'}]`
 
+### 9. Recommend with conviction, permit deviation explicitly
+
+The "honest about skipping" principle (#4) governs how individual recommendations frame the option to skip. This principle governs the *default* recommendation itself.
+
+Copper Owl's value depends on having a clear opinion. A wishy-washy recommendation ("you could do X or Y or Z, depending on preference") tests worse than a directive recommendation paired with explicit permission to deviate ("Heart of Thorns is the natural next step. Path of Fire works too if mounts sound more appealing — both expansions stand alone.").
+
+The two halves are equally important:
+
+- **Conviction**: name the recommended default clearly. Don't list alternatives as equals.
+- **Permission**: explicitly name what else works. Don't imply the default is mandatory.
+
+✅ "Heart of Thorns is the natural next step. Path of Fire works too if mounts sound more appealing — both expansions stand alone."
+
+✅ "Continue the Personal Story. The racial finale chapter is two sessions away. Skippable, but worth knowing if Living World Season 1 comes up later."
+
+❌ "Some players prefer HoT first; others go straight to PoF. Both are valid."
+
+❌ "You should finish HoT before moving on."
+
+The pattern: lead with the recommendation, follow with the alternative named explicitly, close with the reason both work.
+
+This principle is informed by player psychology research showing that perceived sense of progression correlates strongly with engagement, and that decision fatigue from too-many-options-presented-as-equal reduces satisfaction. Players want to be told what to do, with the freedom to deviate. Copper Owl provides exactly that.
+
 ## Common drift patterns to catch
 
 - **Voice slipping to first-person.** "I'd suggest..." → rewrite as observation.

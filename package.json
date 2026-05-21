@@ -30,7 +30,8 @@
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,md}\"",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "postinstall": "bash scripts/link-rules-dev.sh || true"
   },
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-beta.3",
@@ -75,8 +76,5 @@
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20"
-  },
-  "optionalDependencies": {
-    "@copper-owl/rules": "workspace:*"
   }
 }
