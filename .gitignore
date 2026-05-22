@@ -35,6 +35,9 @@ src-tauri/Cargo.lock
 # TypeScript incremental build cache
 *.tsbuildinfo
 
+# Local scratch/working files (not committed)
+scratch/
+
 # Test coverage
 coverage/
 

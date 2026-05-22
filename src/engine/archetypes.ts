@@ -20,7 +20,7 @@ const ENGAGED_DAYS_THRESHOLD = 14; // played within last 2 weeks
 export function classifyArchetype(account: AccountState | null): PlayerArchetype {
   if (!account) return 'unclassified';
 
-  const { expansions, characters, daysSinceLastLogin } = account;
+  const { expansions, characters, daysSinceLastLogin, pursuingGoal } = account;
   const hasAnyExpansion = Object.values(expansions).some(Boolean);
   const hasMaxLevelCharacter = characters.some((c) => c.level >= 80);
 
@@ -43,8 +43,11 @@ export function classifyArchetype(account: AccountState | null): PlayerArchetype
     return 'fresh_80';
   }
 
-  // Engaged: plays recently. Committed vs casual differentiation will come
-  // when we have goal tracking. For now, default to engaged_casual.
-  // TODO: detect goal pursuit from wallet currencies / character progress
+  // Engaged: plays recently. The committed/casual split uses the explicit
+  // pursuingGoal flag (set today only via anonymous-mode self-classification;
+  // a future heuristic over wallet/character progress can fill it for API mode).
+  if (pursuingGoal === true) {
+    return 'engaged_committed';
+  }
   return 'engaged_casual';
 }

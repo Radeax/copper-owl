@@ -4,7 +4,7 @@ import { recommend } from '@/engine/recommend';
 import { useReset } from '@/utils/useReset';
 import { RecommendationCard } from '@/components/cards/RecommendationCard';
 import { ResetClock } from '@/components/cards/ResetClock';
-import { useAuthStore } from '@/state/auth';
+import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
 import { transformGW2Account } from '@/api/transform';
@@ -23,64 +23,81 @@ function isAuthError(err: unknown): boolean {
 
 function HomePage() {
   const navigate = useNavigate();
-  const { session, signOut } = useAuthStore();
-  const apiKey = session?.apiKey;
+  const session = useAuthStore((s) => s.session);
+  const anonymousProfile = useAuthStore((s) => s.anonymousProfile);
+  const signOut = useAuthStore((s) => s.signOut);
   const reset = useReset();
 
+  const isAnonymous = session?.mode === 'anonymous';
+  const apiKey = session?.apiKey;
+
   useEffect(() => {
-    if (!apiKey) void navigate({ to: '/welcome' });
-  }, [apiKey, navigate]);
+    if (!session) {
+      void navigate({ to: '/welcome' });
+    } else if (isAnonymous && !anonymousProfile) {
+      void navigate({ to: '/start' });
+    }
+  }, [session, isAnonymous, anonymousProfile, navigate]);
 
-  const accountQuery = useGW2Account(apiKey);
-  const charsQuery = useGW2Characters(apiKey);
+  // API queries are disabled when apiKey is undefined (anonymous mode).
+  const accountQuery = useGW2Account(isAnonymous ? undefined : apiKey);
+  const charsQuery = useGW2Characters(isAnonymous ? undefined : apiKey);
 
-  const account = useMemo(
-    () =>
-      accountQuery.data && charsQuery.data
-        ? transformGW2Account(accountQuery.data, charsQuery.data)
-        : null,
-    [accountQuery.data, charsQuery.data]
-  );
+  const account = useMemo(() => {
+    if (isAnonymous && anonymousProfile) {
+      return buildSyntheticAccountState(anonymousProfile);
+    }
+    if (accountQuery.data && charsQuery.data) {
+      return transformGW2Account(accountQuery.data, charsQuery.data);
+    }
+    return null;
+  }, [isAnonymous, anonymousProfile, accountQuery.data, charsQuery.data]);
 
   const { archetype, recommendations } = useMemo(
     () => recommend({ account, reset }),
     [account, reset]
   );
 
-  if (!apiKey) return null;
+  if (!session) return null;
+  if (isAnonymous && !anonymousProfile) return null;
 
-  if (accountQuery.isLoading || charsQuery.isLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.statusBand}>
-          <p className={styles.statusText}>Connecting to the GW2 API…</p>
+  // API-only loading + auth-error states.
+  if (!isAnonymous) {
+    if (accountQuery.isLoading || charsQuery.isLoading) {
+      return (
+        <div className={styles.page}>
+          <div className={styles.statusBand}>
+            <p className={styles.statusText}>Connecting to the GW2 API…</p>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (isAuthError(accountQuery.error) || isAuthError(charsQuery.error)) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.statusBand}>
-          <p className={styles.statusText}>
-            The API key did not authenticate. A different key may resolve this.
-          </p>
-          <button
-            className={styles.retryLink}
-            onClick={() => {
-              signOut();
-              void navigate({ to: '/welcome' });
-            }}
-          >
-            Try a different key
-          </button>
+    if (isAuthError(accountQuery.error) || isAuthError(charsQuery.error)) {
+      return (
+        <div className={styles.page}>
+          <div className={styles.statusBand}>
+            <p className={styles.statusText}>
+              The API key did not authenticate. A different key may resolve this.
+            </p>
+            <button
+              className={styles.retryLink}
+              onClick={() => {
+                signOut();
+                void navigate({ to: '/welcome' });
+              }}
+            >
+              Try a different key
+            </button>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   if (!account) return null;
+
+  const accountLabel = isAnonymous ? 'Anonymous profile' : (account.name ?? 'Account');
 
   return (
     <div className={styles.page}>
@@ -91,7 +108,7 @@ function HomePage() {
         </div>
         <h1 className={styles.welcome}>What this session is for</h1>
         <p className={styles.account}>
-          {account.name} ·{' '}
+          {accountLabel} ·{' '}
           <span className={styles.archetype}>{archetype.replace(/_/g, ' ')}</span>
         </p>
       </header>
@@ -105,6 +122,16 @@ function HomePage() {
           <RecommendationCard key={rec.id} recommendation={rec} />
         ))}
       </section>
+
+      {isAnonymous && (
+        <button
+          type="button"
+          className={styles.switchLink}
+          onClick={() => navigate({ to: '/start' })}
+        >
+          Switch starting point
+        </button>
+      )}
     </div>
   );
 }

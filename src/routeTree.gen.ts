@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as OrientationRouteImport } from './routes/orientation'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrientationRoute = OrientationRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/orientation': typeof OrientationRoute
+  '/start': typeof StartRoute
   '/welcome': typeof WelcomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/orientation': typeof OrientationRoute
+  '/start': typeof StartRoute
   '/welcome': typeof WelcomeRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/orientation': typeof OrientationRoute
+  '/start': typeof StartRoute
   '/welcome': typeof WelcomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/orientation' | '/welcome'
+  fullPaths: '/' | '/home' | '/orientation' | '/start' | '/welcome'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/orientation' | '/welcome'
-  id: '__root__' | '/' | '/home' | '/orientation' | '/welcome'
+  to: '/' | '/home' | '/orientation' | '/start' | '/welcome'
+  id: '__root__' | '/' | '/home' | '/orientation' | '/start' | '/welcome'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
   OrientationRoute: typeof OrientationRoute
+  StartRoute: typeof StartRoute
   WelcomeRoute: typeof WelcomeRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orientation': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
   OrientationRoute: OrientationRoute,
+  StartRoute: StartRoute,
   WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
