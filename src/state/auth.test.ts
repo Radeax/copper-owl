@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   ALL_EXPANSIONS,
   NO_EXPANSIONS,
@@ -125,5 +125,40 @@ describe('buildSyntheticAccountState', () => {
       hasMaxLevel: true,
     });
     expect(state.pursuingGoal).toBeNull();
+  });
+});
+
+describe('useAuthStore — persisted hydration timing', () => {
+  // start.tsx pre-selects a card via useState(initialKey), where initialKey
+  // derives from useAuthStore's anonymousProfile. That is only correct if the
+  // store is already hydrated on the component's first render. The store uses
+  // persist + createJSONStorage(localStorage); localStorage is synchronous, so
+  // hydration runs inside create() at module-eval — before any render. This
+  // test pins that: it is the regression guard if storage ever goes async.
+  beforeEach(() => {
+    localStorage.clear();
+    vi.resetModules();
+  });
+
+  it('rehydrates anonymousProfile synchronously at store creation, before any render', async () => {
+    const profile: AnonymousProfile = {
+      archetype: 'returning',
+      expansions: ALL_EXPANSIONS,
+      daysSinceLastLogin: 365,
+      hasMaxLevel: true,
+    };
+
+    // First store instance writes the profile to localStorage via persist.
+    const first = await import('./auth');
+    first.useAuthStore.getState().setAnonymousProfile(profile);
+    expect(localStorage.getItem('copper-owl-auth')).not.toBeNull();
+
+    // Fresh module graph — simulates a new page load. persist reads
+    // localStorage during create(). No await for hydration, no act(), no
+    // effect: if the profile is present immediately, hydration is synchronous
+    // and start.tsx's useState(initialKey) captures it on the first render.
+    vi.resetModules();
+    const second = await import('./auth');
+    expect(second.useAuthStore.getState().anonymousProfile).toEqual(profile);
   });
 });

@@ -42,6 +42,11 @@ export interface OrientationSearch {
 export const Route = createFileRoute('/orientation')({
   component: OrientationPage,
   validateSearch: (search: Record<string, unknown>): OrientationSearch => {
+    // ?state= is a development-only escape hatch for reaching O1/O5 (and
+    // forcing any view) before story-completion data exists. Stripped from
+    // production builds so a shared link can't force a synthetic orientation
+    // state that doesn't match the account.
+    if (!import.meta.env.DEV) return {};
     const raw = typeof search.state === 'string' ? search.state : undefined;
     return raw && OVERRIDE_KEYS.has(raw as OrientationState)
       ? { state: raw as OrientationState }
@@ -51,7 +56,7 @@ export const Route = createFileRoute('/orientation')({
 
 // Highest-tier expansion owned picks the orientation state.
 // O1 (PS unfinished) and O5 (HoT-vs-PoF choice) are reachable only via
-// the ?state= query override until story-completion data is available.
+// the dev-only ?state= query override until story-completion data is available.
 function pickOrientationState(account: AccountState | null): OrientationState {
   if (!account) return 'o2';
   const e = account.expansions;
