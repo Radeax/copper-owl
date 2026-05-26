@@ -68,6 +68,8 @@ Before opening any PR, run the appropriate review agent:
 
 For multi-category PRs, run multiple reviewers. The reviewers compose; the same change can go through code-reviewer for correctness and voice-reviewer for prose.
 
+When updating agents (`.claude/agents/`) or slash commands (`.claude/commands/`), also update the [Claude Code Workflow page in Notion](https://www.notion.so/36cfe492e88e811ca48bf7a6789667f2) so the external documentation stays in sync. The Notion workspace is private to the maintainer — the link is for the maintainer's reference, not a public document.
+
 ## Writing PRDs
 
 Use `/prd-new <feature description>` to generate a new PRD. The `prd-writer` agent handles numbering, format consistency, status accuracy, and cross-reference verification. It saves to `docs/product/NNNN-<kebab-name>.md` and suggests the branch + PR + issue flow.
