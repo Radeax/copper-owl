@@ -31,11 +31,11 @@ Tuned for GW2's rate-limited API in `src/main.tsx`:
 
 ### Zustand for UI state
 
-Three stores planned, one implemented:
+One store currently, doing the work the original three-store plan split out:
 
-- `src/state/auth.ts` ✅ — Session, persisted to localStorage
-- `src/state/preferences.ts` ⏳ — user preferences (planned)
-- `src/state/profile.ts` ⏳ — cached account snapshot for anonymous mode (planned)
+- `src/state/auth.ts` — Session + AnonymousProfile, persisted to localStorage at key `copper-owl-auth`
+
+The store consolidates auth state and anonymous-profile self-classification because they're updated atomically (entering anonymous mode establishes both a session and a profile in one transition). If a third concern emerges that doesn't share that lifetime — durable user preferences across sign-outs, or a cached account snapshot independent of session — a second store will be added then. Not before.
 
 ### xstate for state machines
 
@@ -93,16 +93,17 @@ The recommendation engine produces `Recommendation` objects with:
 - `bannerKey` — references the painted-SVG library
 - `sources` — optional citation links
 
-Voice principles enforce themselves through the rule modules: every recommendation is hand-written prose, no template strings interpolating account data into vague language. The cost is that adding rules takes thought; the benefit is that the voice stays consistent.
+Voice principles enforce themselves through the rule modules: every recommendation is hand-written prose, no template strings interpolating account data into vague language. The cost is that adding rules takes thought; the benefit is that the voice stays consistent. See `docs/voice.md` for the full nine principles, including principle 9 (recommend with conviction, permit deviation explicitly) which governs how the default recommendation should be framed relative to alternatives.
 
 ## What's deferred
 
-- Painted SVG library port from prototypes (in progress)
-- xstate machines (planned, not yet implemented)
-- gw2.me OAuth PKCE flow (planned)
-- Real GW2 API integration in routes (currently mocked at the engine level)
+- xstate machines (declared in the stack but not yet implemented; auth, recommendation orchestration, reset clock are the candidates)
+- gw2.me OAuth PKCE flow (third access mode; the unified Session shape supports it but the flow is stubbed)
+- Real API integration error UX polish (429 rate-limit handling and network-failure recoverable retry on /home; see PRD 0003)
+- Mastery gate awareness in recommendations (see PRD 0002, depends on PRD 0003 closing)
+- Playstyle preference UI and rule consumption (see PRD 0001)
 - Push notifications for reset (Tauri native plugin work)
 - WvW ticket pacer (third product module, not v1)
 - Friends features (v2+)
 
-See `docs/roadmap.md` (TODO) for the full picture.
+See `docs/product/` for active feature specs.
