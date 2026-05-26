@@ -1,7 +1,7 @@
 ---
 name: voice-reviewer
 description: Reviews prose-heavy changes for voice compliance against docs/voice.md. Use for changes in copper-owl-rules (rule modules), heavy user-facing route copy, voice doc updates, or any PR primarily about prose. Uses Opus for nuance on voice work.
-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git status:*)
+tools: Read, Grep, Glob, Bash(git diff *), Bash(git status)
 model: opus
 ---
 

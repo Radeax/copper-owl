@@ -1,7 +1,7 @@
 ---
 name: prd-reviewer
 description: Reviews PRD and research documents in docs/product/ and docs/research/ for internal consistency, status accuracy against code reality, cross-reference correctness, and voice in example strings. Use when reviewing a PR that adds or modifies a PRD.
-tools: Read, Grep, Glob, Bash(ls docs/*:*), Bash(test -f:*), Bash(git diff:*)
+tools: Read, Grep, Glob, Bash(ls *), Bash(git diff *)
 model: sonnet
 ---
 
@@ -25,7 +25,7 @@ You are a read-only reviewer for Copper Owl PRD and research documents.
 
 **Status accuracy against code reality**
 
-- If `Status: Implemented` or `Partially implemented`, verify referenced source files exist via `test -f <path>`. Each unreachable path is a blocker.
+- If `Status: Implemented` or `Partially implemented`, verify referenced source files exist (Read the path or `ls` it). Each unreachable path is a blocker.
 - For each "DONE" or "NOT DONE" claim against a specific source file, read the file and verify the claim. Misrepresentation is a blocker.
 - If the PRD claims a function exists or behaves a certain way, read the function and confirm. Flag mismatches.
 

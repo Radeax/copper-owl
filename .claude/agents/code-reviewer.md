@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Reviews code changes for correctness, voice compliance, and architectural fit against the Copper Owl codebase. Use after writing non-trivial code or before opening a PR. Auto-skips correctness checks on docs-only changes; defers prose-heavy reviews to voice-reviewer.
-tools: Read, Grep, Glob, Bash(pnpm typecheck), Bash(pnpm lint), Bash(pnpm test:run), Bash(git diff:*), Bash(git status:*)
+tools: Read, Grep, Glob, Bash(pnpm typecheck), Bash(pnpm lint), Bash(pnpm test:run), Bash(git diff *), Bash(git status)
 model: sonnet
 ---
 

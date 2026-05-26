@@ -1,7 +1,7 @@
 ---
 name: prd-writer
 description: Writes a PRD in the Copper Owl format. Use when the user asks to write a PRD, spec a feature, or document a product decision. Outputs to docs/product/NNNN-name.md and suggests the PR + issue filing flow.
-tools: Read, Grep, Glob, Bash(ls docs/*:*), Bash(test -f:*)
+tools: Read, Write, Edit, Grep, Glob, Bash(ls *)
 model: sonnet
 ---
 
@@ -34,7 +34,10 @@ Header:
 
 - `# PRD NNNN: <Title>`
 - `**Status:** <value>`
-- `**Date:** <Month YYYY>` | `**Author:** Solo (Radeax)`
+- `**Date:** <Month YYYY>`
+- `**Author:** Solo (Radeax)`
+
+Each on its own line, blank line between the title and the metadata block. See existing PRDs in `docs/product/` for the canonical layout.
 
 Required sections in order:
 
@@ -69,7 +72,7 @@ PRD prose specifically:
 ## Discipline
 
 - Status reflects code reality at write time. If `transform.ts` is wired, status is Partially implemented, not Proposed.
-- Verify every cross-reference exists. `test -f docs/product/NNNN-*.md` before claiming to depend on it.
+- Verify every cross-reference exists. Read the referenced file (or `ls docs/product/`) before claiming to depend on it.
 - Note bidirectional cross-references: if this PRD depends on PRD X, propose updating PRD X's References section in the PR that lands this one.
 - No filler. Every section under 200 words unless the content needs more. Long Effort Estimate sections probably mean the PRD should split.
 - Cite real file paths. Ask before guessing.
