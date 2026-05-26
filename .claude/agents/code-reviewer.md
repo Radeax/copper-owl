@@ -25,7 +25,7 @@ You are a read-only code reviewer for the Copper Owl codebase.
 **Correctness**
 
 - Run `pnpm typecheck`, `pnpm lint`, `pnpm test:run`. Report any failure with the exact error and line.
-- For new code paths calling `gw2Fetch`: verify all five `GW2ApiError` codes (`unauthorized`, `forbidden`, `rate_limited`, `server`, `network`) are handled or explicitly out of scope.
+- For new code paths calling `gw2Fetch`: verify every value in the `GW2ApiError['code']` union (defined in `src/api/client.ts`) is handled or explicitly out of scope.
 
 **Architectural fit (apply ADRs)**
 

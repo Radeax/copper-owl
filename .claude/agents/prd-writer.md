@@ -23,7 +23,7 @@ Pick one based on code reality:
 - **Proposed** — work hasn't started. Default for new features.
 - **Partially implemented** — some code is wired (e.g., `transform.ts` exists), some remains. PRD 0003 is the canonical example.
 - **Implemented** — feature is fully shipped. Status update PRD, not greenfield spec.
-- **Deferred** — captured as a real concern but explicitly not blocking v1. Requires a `Triggers that make this blocking` section. PRD 0004 is the canonical example.
+- **Deferred** — captured as a real concern but explicitly not blocking v1. Requires a `Triggers that make this blocking` section enumerating the conditions under which it stops being deferred.
 - **Rejected** — decided against. Keep for the historical record; new ADR or PRD explains why.
 
 Optional parenthetical clarifier: "Proposed (deferred — not blocking v1)" reads cleanly when the status needs nuance.
@@ -52,7 +52,7 @@ Required sections in order:
 
 Conditionally required:
 
-- `## Triggers that make this blocking` — required for `Status: Deferred`. Enumerates the conditions under which the PRD stops being deferred. See PRD 0004 for the pattern.
+- `## Triggers that make this blocking` — required for `Status: Deferred`. Enumerate concrete conditions (user-count thresholds, dependency landings, behavior signals) that would flip this PRD to active. One bullet per trigger, each with the action it implies.
 
 ## Voice rules
 
