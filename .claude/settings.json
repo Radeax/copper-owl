@@ -5,6 +5,8 @@
       "Read",
       "Edit",
       "Write",
+      "Grep",
+      "Glob",
       "Bash(pnpm test*)",
       "Bash(pnpm typecheck)",
       "Bash(pnpm lint*)",

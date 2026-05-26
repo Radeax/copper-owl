@@ -57,3 +57,30 @@ If you want to fork this engine and ship your own GW2 tool with your own rules, 
 ## License
 
 MIT for the engine. The private rule package is licensed separately under all-rights-reserved terms.
+
+## Review workflow
+
+Before opening any PR, run the appropriate review agent:
+
+- **Code changes** → `/review` (invokes `code-reviewer`). Auto-skips for docs-only PRs; defers to specialized reviewers when scope warrants.
+- **PRD or research doc changes only** → `/prd-review` (invokes `prd-reviewer`). Catches consistency and accuracy issues against landed code.
+- **Prose-heavy changes** (rule modules in `copper-owl-rules`, voice doc updates, heavy route copy) → `/voice` (invokes `voice-reviewer`). Opus-backed for nuance on voice work.
+
+For multi-category PRs, run multiple reviewers. The reviewers compose; the same change can go through code-reviewer for correctness and voice-reviewer for prose.
+
+## Writing PRDs
+
+Use `/prd-new <feature description>` to generate a new PRD. The `prd-writer` agent handles numbering, format consistency, status accuracy, and cross-reference verification. It saves to `docs/product/NNNN-<kebab-name>.md` and suggests the branch + PR + issue flow.
+
+Don't commit PRDs directly to main. Follow the same branch + PR pattern as code changes.
+
+## Branch and PR discipline
+
+- Branch off main for every change: `git checkout -b <kind>/<short-name>`. Kinds: `feat/`, `fix/`, `docs/`, `chore/`, `refactor/`.
+- Run the appropriate review agent before pushing.
+- Use the PR template; fill out test plan, voice rewrites, and known deferred items honestly.
+- After merge, file GitHub issues using `.github/ISSUE_TEMPLATE/implementation.md` for any PRDs ready for implementation work.
+
+## Exempt from voice rules
+
+Code comments, console logs, test fixtures, HTML comments in templates, commit messages, ADR/PRD prose outside example blockquotes, and CSS string values. Voice applies to what the player reads, not internal text.
