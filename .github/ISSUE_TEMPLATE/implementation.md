@@ -9,8 +9,6 @@ labels: implementation
 
 <!-- Link to the PRD or design doc in docs/product/. -->
 
-- 
-
 ## Acceptance criteria
 
 <!-- The conditions that determine this issue is done. Specific user flows, engine behaviors, or API responses that should work. -->
@@ -30,7 +28,7 @@ labels: implementation
 
 <!-- Other issues or PRDs this work depends on. Use "Blocked by #N" so GitHub links them. Write "None" if standalone. -->
 
-- 
+- None
 
 ## Test plan
 
@@ -51,4 +49,4 @@ labels: implementation
 
 <!-- If this work touches user-facing prose, what voice work is expected? Reference docs/voice.md principles. Write "N/A" if no prose changes. -->
 
--
+- N/A

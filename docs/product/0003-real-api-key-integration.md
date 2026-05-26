@@ -21,7 +21,7 @@ Author has a personal GW2 key ready (WvW-focused engaged_committed player). The 
 
 In scope (phase 1):
 
-- transformGW2Account fetches /v2/account using the stored API key via the existing gw2Fetch wrapper — DONE in src/api/transform.ts
+- The existing GW2 client and TanStack Query hooks fetch /v2/account and /v2/characters using the stored API key via gw2Fetch, and transformGW2Account maps those fetched responses into AccountState — DONE across src/api/gw2.ts and src/api/transform.ts
 - The dispatcher routes API-key sessions through a real account-state load before rendering /home — DONE in src/routes/index.tsx
 - /home renders recommendations through the existing engine pipeline with real account state as input — DONE in src/routes/home.tsx
 - Loading state during initial fetch (skeleton or minimal indicator, not a blank flash) — PARTIAL; statusBand exists but minimal
