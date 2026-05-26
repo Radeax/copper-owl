@@ -34,7 +34,7 @@ The scope line: Copper Owl handles session-level decision support (what should y
 
 Three engine pieces:
 
-1. **Account mastery state.** Extend transformGW2Account to fetch /v2/account/masteries and /v2/masteries. Transform into a MasteryState field on AccountState mapping canonical mastery names to current tier levels. Depends on PRD 0003 (real API integration) landing first.
+1. **Account mastery state.** Add GW2 API fetch hooks for /v2/account/masteries and /v2/masteries (paralleling the existing useGW2Account and useGW2Characters hooks). Then extend transformGW2Account to accept those fetched responses and map them into a MasteryState field on AccountState, mapping canonical mastery names to current tier levels. Depends on PRD 0003 (real API integration) landing first.
 
 2. **Mastery gate lookup table.** New file src/engine/mastery-gates.ts with a static map: story chapter ID → required masteries. Canonical GW2 data, not curated content — belongs in the engine. HoT data already captured at docs/research/0001-hot-mastery-gates.md.
 

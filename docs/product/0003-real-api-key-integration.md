@@ -6,13 +6,13 @@
 
 ## User problem
 
-The API key entry flow accepts a GW2 API key and stores it in the auth store. The dispatcher routes API-key sessions to /home. The transformGW2Account function in src/api/transform.ts is implemented against real /v2/account responses, and src/routes/home.tsx consumes real account data via useGW2Account + useGW2Characters hooks.
+The API key entry flow accepts a GW2 API key and stores it in the auth store. The root dispatcher loads and classifies the real account state, routing `fresh_80` accounts to `/orientation` and all other archetypes to `/home`. The transformGW2Account function in src/api/transform.ts maps fetched /v2/account responses into AccountState, and src/routes/home.tsx consumes real account data via the useGW2Account + useGW2Characters hooks.
 
 What's still missing for the loop to close:
 
 - Anonymized real-API-response fixtures committed to the repo for regression tests
 - Manual verification that an actual GW2 key produces sensible /home recommendations (the author has a key ready)
-- Error-state UX for 429 rate-limit and network failures (401 unauthorized is handled and redirects cleanly)
+- Error-state UX for 429 rate-limit and network failures (401 unauthorized already surfaces a recoverable status band on /home with a "Try a different key" action that signs out and returns to /welcome)
 - Loading state polish during the initial fetch
 
 Author has a personal GW2 key ready (WvW-focused engaged_committed player). The acceptance test is: "Copper Owl shows recommendations against my actual account, including correct archetype classification, real reset-clock awareness, and recommendations that reference my actual game state."
@@ -26,7 +26,7 @@ In scope (phase 1):
 - /home renders recommendations through the existing engine pipeline with real account state as input — DONE in src/routes/home.tsx
 - Loading state during initial fetch (skeleton or minimal indicator, not a blank flash) — PARTIAL; statusBand exists but minimal
 - Error handling:
-  - 401 invalid/revoked key → clear the session, redirect to /welcome — DONE
+  - 401 invalid/revoked key → surface a recoverable status band on /home with a "Try a different key" action that signs out and returns to /welcome — DONE
   - 429 rate-limit → respect Retry-After, surface a brief "rate limited, retrying" state — NOT DONE
   - Network failure → retry once via TanStack Query, then surface a recoverable error state with a manual retry action — NOT DONE
 - TanStack Query caching applies as already configured (5 min staleTime, 30 min gcTime) — DONE via main.tsx defaults

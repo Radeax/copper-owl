@@ -57,7 +57,7 @@ This is worth capturing because it explains why older guides may quote XP grind 
 | Track | Unlock condition |
 |---|---|
 | Gliding | Complete "Torn from the Sky" (HoT Chapter 1) |
-| Itzel Lore | Unlocks alongside Gliding when expansion is owned and level 80 |
+| Itzel Lore | Complete "Torn from the Sky" (unlocks alongside Gliding) |
 | Exalted Lore | Enter Auric Basin through Tarnished Treetop after completing "Torn from the Sky" |
 | Nuhoch Lore | Enter Tangled Depths after completing "Torn from the Sky" |
 | Raids | Complete any encounter in Forsaken Thicket or Bastion of the Penitent raids |
