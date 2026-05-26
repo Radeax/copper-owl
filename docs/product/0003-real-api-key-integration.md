@@ -28,7 +28,7 @@ In scope (phase 1):
 - Error handling:
   - 401 invalid/revoked key → surface a recoverable status band on /home with a "Try a different key" action that signs out and returns to /welcome — DONE
   - 429 rate-limit → respect Retry-After, surface a brief "rate limited, retrying" state — NOT DONE
-  - Network failure → retry once via TanStack Query, then surface a recoverable error state with a manual retry action — NOT DONE
+  - Network failure → retry up to 2 times via TanStack Query (per the QueryClient default in src/main.tsx), then surface a recoverable error state with a manual retry action — NOT DONE
 - TanStack Query caching applies as already configured (5 min staleTime, 30 min gcTime) — DONE via main.tsx defaults
 - Real-account fixture committed for regression tests — NOT DONE
 

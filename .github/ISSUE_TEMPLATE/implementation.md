@@ -13,16 +13,16 @@ labels: implementation
 
 <!-- The conditions that determine this issue is done. Specific user flows, engine behaviors, or API responses that should work. -->
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] <criterion>
+- [ ] <criterion>
+- [ ] <criterion>
 
 ## Implementation pieces
 
 <!-- The work broken down. Doesn't need to be exact — captures the shape of the change. -->
 
-- [ ] 
-- [ ] 
+- [ ] <work item>
+- [ ] <work item>
 
 ## Dependencies
 
@@ -43,7 +43,7 @@ labels: implementation
 
 <!-- What this issue explicitly does NOT cover. Helps prevent scope creep during implementation. Pull from the PRD's "Out of scope" section. -->
 
-- 
+- None
 
 ## Voice rewrites
 
