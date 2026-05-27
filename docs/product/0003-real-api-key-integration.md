@@ -1,6 +1,6 @@
 # PRD 0003: Real GW2 API integration end-to-end
 
-**Status:** Partially implemented (transform.ts and home.tsx wired; manual testing against real keys + fixture tests + error UX still pending)
+**Status:** Partially implemented (transform.ts and home.tsx wired; tokeninfo scope verification, fixture tests, 429 and network UX, and manual integration test still pending — being closed by this branch)
 **Date:** May 2026
 **Author:** Solo (Radeax)
 
@@ -31,6 +31,8 @@ In scope (phase 1):
   - Network failure → retry up to 2 times via TanStack Query (per the QueryClient default in src/main.tsx), then surface a recoverable error state with a manual retry action — NOT DONE
 - TanStack Query caching applies as already configured (5 min staleTime, 30 min gcTime) — DONE via main.tsx defaults
 - Real-account fixture committed for regression tests — NOT DONE
+- Token scope verification via /v2/tokeninfo fetch on session establishment; surface scope warnings if expected scopes (account, characters, progression) are missing — NOT DONE
+- Skeleton loading states on /home and /orientation during initial fetch (replacing the current bare text "Connecting to the GW2 API…" / "Loading account data…") — NOT DONE
 
 Out of scope for phase 1 (deferred to follow-up PRDs):
 
@@ -43,13 +45,17 @@ Out of scope for phase 1 (deferred to follow-up PRDs):
 
 ## Remaining implementation pieces
 
-1. **Capture and commit anonymized fixtures.** Use the author's real /v2/account response, anonymize account.id and character names, commit at src/api/__fixtures__/account-engaged-committed.json. Use in transform.test.ts for regression coverage of the WvW-focused archetype classification path.
+1. **Capture and commit anonymized fixtures.** Use the author's real /v2/account and /v2/characters responses, anonymize account.id, character names, and world. Commit at src/api/__fixtures__/account-engaged-committed.json. Use in transform.test.ts for regression coverage of the WvW-focused archetype classification path.
 
-2. **429 rate-limit handling in src/api/client.ts.** Currently the error code 'rate_limited' is returned but no Retry-After header is consulted. Read Retry-After from the response, expose a way for the UI to surface a brief countdown.
+2. **Token scope verification.** Fetch /v2/tokeninfo on session establishment via useGW2TokenInfo (already defined in src/api/gw2.ts). Surface a non-blocking warning on /home if the token is missing 'account' (always needed), 'characters' (needed for archetype classification), or 'progression' (needed for future mastery-gates work in PRD 0002). Warning copy: "This key is missing the {scope} scope. Some features won't work until the key is regenerated with it." per voice principles.
 
-3. **Network failure UX.** TanStack Query's default retry behavior covers transient failures. After exhausted retries, the error state should be a single-line recoverable surface on /home with a Retry button that re-runs the query rather than a hard error page.
+3. **429 rate-limit handling in src/api/client.ts.** Currently the error code 'rate_limited' is returned but no Retry-After header is consulted. Read Retry-After from the response, attach it to the GW2ApiError instance (new optional retryAfterSeconds field), surface a brief countdown banner on /home when active.
 
-4. **Manual integration test against real account.** Enter the author's real API key in dev, verify /home renders engaged_committed archetype, reset clock is accurate, recommendations reference real expansion ownership.
+4. **Network failure UX.** TanStack Query's default retry behavior (up to 2 retries on non-4xx errors) covers transient failures. After exhausted retries, the error state should be a single-line recoverable surface on /home with a Retry button that re-runs the query rather than a hard error page.
+
+5. **Skeleton loading states.** Replace the current "Connecting to the GW2 API…" / "Loading account data…" bare-text states with subtle skeleton placeholders matching the eventual content shape (one for the recommendation cards, one for the reset clock). Keep the text label as a screen-reader announcement.
+
+6. **Manual integration test against real account.** Enter the author's real API key in dev, verify /home renders engaged_committed archetype, reset clock is accurate, recommendations reference real expansion ownership. Verify the tokeninfo scope warnings appear correctly for a key missing 'progression'.
 
 ## Test plan
 

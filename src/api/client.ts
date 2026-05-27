@@ -14,6 +14,20 @@ import { gw2Queue } from './queue';
 
 const GW2_API_BASE = 'https://api.guildwars2.com';
 
+/**
+ * Pin to a specific GW2 API schema version. ArenaNet's API uses schema versioning
+ * to prevent surprise breaking changes: fields like last_modified on /v2/account
+ * and /v2/characters only appear when an explicit schema version is requested.
+ *
+ * 2022-03-23T19:00:00.000Z is post-EoD release, well past the 2019-02-21 schema
+ * that introduced last_modified, and includes EoD content schemas the engine
+ * will need. Bump when ArenaNet ships a meaningful new schema version Copper
+ * Owl wants to consume.
+ *
+ * Reference: https://wiki.guildwars2.com/wiki/API:2
+ */
+const GW2_SCHEMA_VERSION = '2022-03-23T19:00:00.000Z';
+
 export class GW2ApiError extends Error {
   public readonly status: number;
   public readonly code: 'unauthorized' | 'forbidden' | 'rate_limited' | 'server' | 'network' | 'unknown';
@@ -49,6 +63,7 @@ export async function gw2Fetch<T = unknown>(
   const url = `${GW2_API_BASE}${path}`;
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    'X-Schema-Version': GW2_SCHEMA_VERSION,
   };
   if (options.apiKey) {
     headers.Authorization = `Bearer ${options.apiKey}`;

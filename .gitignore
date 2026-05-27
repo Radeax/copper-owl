@@ -49,3 +49,6 @@ coverage/
 # OS
 .DS_Store
 Thumbs.db
+
+# Temporary raw API responses for fixture generation — never committed
+.tmp-fixtures/
