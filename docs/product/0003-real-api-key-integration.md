@@ -30,7 +30,7 @@ In scope (phase 1):
   - 429 rate-limit → respect Retry-After, surface a brief "rate limited, retrying" state — NOT DONE
   - Network failure → retry up to 2 times via TanStack Query (per the QueryClient default in src/main.tsx), then surface a recoverable error state with a manual retry action — NOT DONE
 - TanStack Query caching applies as already configured (5 min staleTime, 30 min gcTime) — DONE via main.tsx defaults
-- Real-account fixture committed for regression tests — NOT DONE
+- Real-account fixture committed for regression tests — fixtures DONE (commit 4a4c0d6); test wiring NOT DONE (see remaining piece #1)
 - Token scope verification via /v2/tokeninfo fetch on session establishment; surface scope warnings if expected scopes (account, characters, progression) are missing — NOT DONE
 - Skeleton loading states on /home and /orientation during initial fetch (replacing the current bare text "Connecting to the GW2 API…" / "Loading account data…") — NOT DONE
 
@@ -45,7 +45,7 @@ Out of scope for phase 1 (deferred to follow-up PRDs):
 
 ## Remaining implementation pieces
 
-1. **Capture and commit anonymized fixtures.** Use the author's real /v2/account and /v2/characters responses, anonymize account.id, character names, and world. Commit at src/api/__fixtures__/account-engaged-committed.json. Use in transform.test.ts for regression coverage of the WvW-focused archetype classification path.
+1. **Wire the committed fixtures into transform.test.ts.** Anonymized real-account fixtures already landed in PRD 0003 Phase 1 (commit 4a4c0d6, `src/api/__fixtures__/`). What remains is adding regression tests that run `transformGW2Account` over those fixtures and assert the WvW-focused engaged_committed classification path. Anonymization rules are documented in `src/api/__fixtures__/README.md` and should be respected when adding new fixture variants.
 
 2. **Token scope verification.** Fetch /v2/tokeninfo on session establishment via useGW2TokenInfo (already defined in src/api/gw2.ts). Surface a non-blocking warning on /home if the token is missing 'account' (always needed), 'characters' (needed for archetype classification), or 'progression' (needed for future mastery-gates work in PRD 0002). Warning copy: "This key is missing the {scope} scope. Some features won't work until the key is regenerated with it." per voice principles.
 

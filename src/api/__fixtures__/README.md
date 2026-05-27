@@ -1,6 +1,8 @@
 # API fixtures
 
-Anonymized real GW2 API responses captured against the author's account, used in `transform.test.ts` for regression coverage of the engaged_committed archetype classification path.
+Anonymized real GW2 API responses captured against the author's account. Intended for regression coverage of the engaged_committed archetype classification path in `transform.test.ts`.
+
+**Status:** the fixtures themselves land in PRD 0003 Phase 1 (this commit). The tests that consume them are deferred to Phase 2 — until then, `transform.test.ts` still runs against synthetic data only.
 
 ## Files
 
