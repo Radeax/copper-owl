@@ -52,7 +52,7 @@ Established: wiki-canonical, cross-validate contested data across multiple AIs, 
 
 Currently readable: archetype, expansions, character levels, days-since-login, reset state, pursuingGoal.
 
-Potentially readable as the API integration expands: mastery state (PRD 0002), Living World ownership (PRD 0004), wallet, achievements, current story chapter, WvW rank, daily/weekly completion state.
+Potentially readable as the API integration expands: mastery state (PRD 0002), Living World ownership (PRD 0004, planned), wallet, achievements, current story chapter, WvW rank, daily/weekly completion state.
 
 **Decision per factor**: does it earn its place by changing recommendations *meaningfully*, or is it noise? A "what factors matter, in what order of importance" conversation beats bolting on signals as the API surfaces them. The discipline mirrors the fixture-anonymization discipline: a factor is worth reading only if a rule actually consumes it.
 
@@ -105,12 +105,12 @@ Likely outputs (to be decided in the conversation, not prescribed here):
 
 Not all in one session. The first session should prioritize: which threads block writing the *first* rule, vs. which can be decided later as the rule set grows. Threads 2 (selection), 7 (workflow), and 8 (first scope) are probably the blocking set. Threads 3-6 can mature as rules accumulate.
 
-## Relationship to existing PRDs
+## Relationship to existing and planned PRDs
 
 - **PRD 0001 (playstyle)**: a modifier on the selection algorithm (thread 2). The selection model must accommodate it.
 - **PRD 0002 (mastery gates)**: a factor (thread 4) and a recommendation type. Mastery-gate-aware HoT rules are part of the first-rules scope (thread 8).
 - **PRD 0003 (API integration)**: provides the factors (thread 4) the rules read. Must be working before rules can consume real account state.
-- **PRD 0004 (Living World)**: a deferred factor (thread 4). Rules don't consume it until that PRD's triggers fire.
+- **PRD 0004 (Living World, planned)**: a deferred factor (thread 4). Rules don't consume it until the PRD is written and its triggers fire.
 
 ## References
 
@@ -118,7 +118,7 @@ Not all in one session. The first session should prioritize: which threads block
 - docs/voice.md — the 9 voice principles all rule prose follows
 - docs/product/0001-playstyle-preference.md — selection modifier
 - docs/product/0002-mastery-gates.md — factor + recommendation type
-- docs/product/0004-living-world-ownership.md — deferred factor (Living World ownership)
+- docs/product/0003-real-api-key-integration.md — provides the factors rules read
 - src/engine/rules/ — the plug-in mechanism (types, registry, example placeholders)
 - src/engine/rules/README.md — the public-facing rule API doc
 - .github/ISSUE_TEMPLATE/rule.md — the rule issue template
