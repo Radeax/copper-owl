@@ -181,7 +181,8 @@ describe('transformGW2Account', () => {
       expect(result.masteries).toBeNull();
       expect(result.pursuingGoal).toBeNull();
       expect(result.characters).toHaveLength(charactersFixture.length);
-      expect(result.characters[0]).toEqual({
+      const heroOne = result.characters.find((c) => c.name === 'Hero One');
+      expect(heroOne).toEqual({
         name: 'Hero One',
         level: 80,
         profession: 'Revenant',
