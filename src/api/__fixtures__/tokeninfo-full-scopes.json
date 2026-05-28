@@ -1,0 +1,18 @@
+{
+  "id": "A1B2C3D4-5678-90EF-1234-567890ABCDEF",
+  "name": "Copper Owl test key",
+  "permissions": [
+    "tradingpost",
+    "characters",
+    "wvw",
+    "pvp",
+    "progression",
+    "wallet",
+    "guilds",
+    "builds",
+    "account",
+    "inventories",
+    "unlocks"
+  ],
+  "type": "APIKey"
+}
