@@ -37,7 +37,7 @@ export interface AccountResponse {
   name: string;
   created: string;
   age: number; // seconds played
-  last_modified: string;
+  last_modified?: string;
   access: string[]; // ['PlayForFree', 'GuildWars2', 'HeartOfThorns', 'PathOfFire', 'EndOfDragons', 'SecretsOfTheObscure', 'JanthirWilds', 'VisionsOfEternity']
 }
 
