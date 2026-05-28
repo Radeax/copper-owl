@@ -1,0 +1,30 @@
+.band {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.text {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.action {
+  display: flex;
+  gap: 12px;
+}
+
+/*
+ * Intent classes — visual accent only. Structure is identical so consumers
+ * can swap intents without layout shift. Both currently render identically
+ * by design; the prop is plumbed so the 429 countdown, network-failure, and
+ * scope-warning pieces of Phase 2 can grow distinct accents without API
+ * churn.
+ */
+.info,
+.error {
+  /* Identical for now; see component JSDoc for the variants' semantic intent. */
+}
