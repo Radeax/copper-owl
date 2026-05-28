@@ -101,7 +101,7 @@ function HomePage() {
               intent="error"
               action={
                 <button
-                  className={styles.retryLink}
+                  className={styles.linkAction}
                   onClick={() => {
                     signOut();
                     void navigate({ to: '/welcome' });
@@ -139,7 +139,31 @@ function HomePage() {
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>
-          <StatusBand>{scopeWarningCopy(missing)}</StatusBand>
+          <StatusBand
+            action={
+              <>
+                <a
+                  className={styles.linkAction}
+                  href="https://account.arena.net/applications"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Manage API keys
+                </a>
+                <button
+                  className={styles.linkAction}
+                  onClick={() => {
+                    signOut();
+                    void navigate({ to: '/welcome' });
+                  }}
+                >
+                  Use a different key
+                </button>
+              </>
+            }
+          >
+            {scopeWarningCopy(missing)}
+          </StatusBand>
         </div>
       )}
 

@@ -23,7 +23,7 @@
 
 /* Quiet observation — scope warning, rate-limit countdown */
 .info {
-  background: var(--bg-3);
+  background: var(--bg-status-info);
   border-left-color: var(--aether-border);
 }
 

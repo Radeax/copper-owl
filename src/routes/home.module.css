@@ -88,7 +88,7 @@
   margin-bottom: 24px;
 }
 
-.retryLink {
+.linkAction {
   background: none;
   border: none;
   padding: 0;
@@ -100,7 +100,7 @@
   text-decoration-color: var(--gold-border);
 }
 
-.retryLink:hover {
+.linkAction:hover {
   color: var(--text);
   text-decoration-color: var(--muted);
 }
