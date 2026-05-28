@@ -41,9 +41,9 @@ export class GW2ApiError extends Error {
 }
 
 export interface FetchOptions {
-  /** Optional API key. If provided, sent as Authorization: Bearer header. */
+  /** Optional API key. If provided, sent as the ?access_token= query param. */
   apiKey?: string;
-  /** Optional Accept-Language header (e.g. 'en', 'de', 'fr'). */
+  /** Optional language (e.g. 'en', 'de', 'fr'). Sent as the ?lang= query param. */
   lang?: string;
   /** AbortSignal for cancellation. */
   signal?: AbortSignal;
@@ -51,7 +51,19 @@ export interface FetchOptions {
 
 /**
  * Fetch a GW2 API endpoint. Path is relative to https://api.guildwars2.com
- * (e.g. '/v2/account', '/v2/characters'). Returns parsed JSON.
+ * (e.g. '/v2/account', '/v2/characters'). May include a query string
+ * (e.g. '/v2/characters?ids=all'); existing params are preserved. Returns
+ * parsed JSON.
+ *
+ * CORS contract — DO NOT BREAK:
+ * The GW2 API does not respond to CORS preflight (OPTIONS), so any non-
+ * safelisted request header causes the browser to fail the request before
+ * it leaves. That means auth and schema-version cannot be sent as
+ * Authorization or X-Schema-Version headers — they go in the query string
+ * as ?access_token= and ?v=, per ArenaNet's documented browser-safe method.
+ * Accept: application/json is CORS-safelisted and is the only header sent.
+ * If you find yourself wanting to add a header here, route it through the
+ * query string instead, or the web build will break.
  */
 export async function gw2Fetch<T = unknown>(
   path: string,
@@ -60,23 +72,20 @@ export async function gw2Fetch<T = unknown>(
   // Wait for a rate-limit token before sending
   await gw2Queue.acquire();
 
-  const url = `${GW2_API_BASE}${path}`;
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-    'X-Schema-Version': GW2_SCHEMA_VERSION,
-  };
+  const url = new URL(path, GW2_API_BASE);
+  url.searchParams.set('v', GW2_SCHEMA_VERSION);
   if (options.apiKey) {
-    headers.Authorization = `Bearer ${options.apiKey}`;
+    url.searchParams.set('access_token', options.apiKey);
   }
   if (options.lang) {
-    headers['Accept-Language'] = options.lang;
+    url.searchParams.set('lang', options.lang);
   }
 
   let response: Response;
   try {
     response = await fetch(url, {
       method: 'GET',
-      headers,
+      headers: { Accept: 'application/json' },
       signal: options.signal,
     });
   } catch (err) {
