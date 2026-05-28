@@ -37,9 +37,11 @@ export function transformGW2Account(
   return {
     name: account.name,
     ageDays: Math.floor((now - new Date(account.created).getTime()) / MS_PER_DAY),
-    daysSinceLastLogin: Math.floor(
-      (now - new Date(account.last_modified).getTime()) / MS_PER_DAY
-    ),
+    daysSinceLastLogin: (() => {
+      if (!account.last_modified) return null;
+      const t = new Date(account.last_modified).getTime();
+      return Number.isFinite(t) ? Math.floor((now - t) / MS_PER_DAY) : null;
+    })(),
     expansions,
     characters: characters.map((c) => ({
       name: c.name,

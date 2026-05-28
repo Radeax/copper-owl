@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { transformGW2Account } from './transform';
 import type { AccountResponse, CharacterResponse } from './gw2';
+import { classifyArchetype } from '@/engine/archetypes';
+import accountFixture from './__fixtures__/account-engaged-committed.json';
+import charactersFixture from './__fixtures__/characters-engaged-committed.json';
 
 const BASE_ACCOUNT: AccountResponse = {
   id: 'test-id',
@@ -99,6 +102,18 @@ describe('transformGW2Account', () => {
       const result = transformGW2Account(account, [], now);
       expect(result.daysSinceLastLogin).toBe(1);
     });
+
+    it('returns daysSinceLastLogin=null when last_modified is missing', () => {
+      const account: AccountResponse = { ...BASE_ACCOUNT, last_modified: undefined };
+      const result = transformGW2Account(account, []);
+      expect(result.daysSinceLastLogin).toBeNull();
+    });
+
+    it('returns daysSinceLastLogin=null when last_modified is malformed', () => {
+      const account: AccountResponse = { ...BASE_ACCOUNT, last_modified: 'not-a-date' };
+      const result = transformGW2Account(account, []);
+      expect(result.daysSinceLastLogin).toBeNull();
+    });
   });
 
   describe('characters', () => {
@@ -133,6 +148,70 @@ describe('transformGW2Account', () => {
     it('pursuingGoal is always null (not derivable from API yet)', () => {
       const result = transformGW2Account(BASE_ACCOUNT, []);
       expect(result.pursuingGoal).toBeNull();
+    });
+  });
+
+  describe('engaged_committed fixture', () => {
+    // Pin `now` to the fixture's last_modified day so date assertions are
+    // deterministic regardless of when the test runs.
+    const FIXED_NOW = Date.UTC(2026, 4, 27); // 2026-05-27 UTC
+
+    let result: ReturnType<typeof transformGW2Account>;
+    beforeEach(() => {
+      result = transformGW2Account(
+        accountFixture as AccountResponse,
+        charactersFixture as CharacterResponse[],
+        FIXED_NOW
+      );
+    });
+
+    it('round-trips through transformGW2Account', () => {
+      expect(result.name).toBe('TestAccount.1234');
+      expect(result.ageDays).toBe(164); // 2025-12-14 → 2026-05-27
+      expect(result.daysSinceLastLogin).toBe(0);
+      expect(result.expansions).toEqual({
+        hot: true, // inferred from pof
+        pof: true,
+        eod: true,
+        soto: true,
+        jw: true,
+        voe: false,
+      });
+      expect(result.wallet).toEqual({});
+      expect(result.masteries).toBeNull();
+      expect(result.pursuingGoal).toBeNull();
+      expect(result.characters).toHaveLength(charactersFixture.length);
+      expect(result.characters[0]).toEqual({
+        name: 'Hero One',
+        level: 80,
+        profession: 'Revenant',
+        lastModified: '2026-05-27T00:00:00Z',
+      });
+    });
+
+    it('PoF in access array implies HoT ownership in expansions', () => {
+      // Precondition: document that the fixture exercises the inference
+      expect(accountFixture.access).toContain('PathOfFire');
+      expect(accountFixture.access).not.toContain('HeartOfThorns');
+
+      expect(result.expansions.pof).toBe(true);
+      expect(result.expansions.hot).toBe(true);
+    });
+
+    it('classifies as engaged_casual when pursuingGoal is null (API-derived default)', () => {
+      expect(classifyArchetype(result)).toBe('engaged_casual');
+    });
+
+    it('classifies as engaged_committed once pursuingGoal=true is set', () => {
+      // transformGW2Account sets pursuingGoal=null for API-derived accounts
+      // because it isn't derivable from the public endpoints yet. The
+      // classifier requires pursuingGoal===true to promote to engaged_committed.
+      // Once that signal exists (anonymous self-classification today, a future
+      // wallet/character heuristic for API mode), this fixture lands in its
+      // namesake archetype.
+      expect(classifyArchetype({ ...result, pursuingGoal: true })).toBe(
+        'engaged_committed'
+      );
     });
   });
 });
