@@ -1,36 +1,49 @@
 # PRD 0003 Phase 2 — Implementation kickoff context
 
-> Last updated: May 2026, post-PR-#9 merge
-> Status: ready to begin
-> Branch: new `feat/real-api-integration-phase-2` off main, OR continue `feat/real-api-integration`
+> Last updated: May 2026, post-PR-#11 merge
+> Status: in progress — piece #2 (fixtures + null-guard) merged via PR #11; piece #1 (CORS fix) queued next
+> Branch: one branch per piece off `main` (Phase 1 + piece #2 already merged there)
 
 This doc captures the working context for closing the remaining PRD 0003 work. Read it before starting any Phase 2 commits. It's a snapshot of decisions made during Phase 1 design discussions that aren't all captured in code or PRDs yet.
 
-## What's already done (Phase 1, PR #9 merged)
+## What's already done
 
-- Schema-version header fix in `src/api/client.ts` (`X-Schema-Version: 2022-03-23T19:00:00.000Z`)
+### Phase 1 (PR #9 merged)
+
+- Schema-version header fix in `src/api/client.ts` (`X-Schema-Version: 2022-03-23T19:00:00.000Z`) — *note: piece #1 below replaces the delivery mechanism. The version string survives; it moves from a header to a `?v=` query param.*
 - Anonymized real-account fixtures at `src/api/__fixtures__/` (account, characters, two tokeninfo variants) plus README documenting anonymization rules
 - PRD 0003 scope expanded to include tokeninfo scope verification and skeleton loading states
 - `.gitignore` blocks `.tmp-fixtures/` from accidental commits
 
-## Phase 2 scope — six remaining implementation pieces
+### Piece #2 — fixture-wired transform tests + null-guard (PR #11 merged)
 
-These map 1:1 to the "Remaining implementation pieces" section in PRD 0003. Numbered for tracking.
+- Loaded each fixture in `transform.test.ts`; asserted `transformGW2Account` round-trip and `classifyArchetype` result for `engaged_committed`
+- Verified the PoF-implies-HoT inference path against real fixture data, not synthetic
+- Defensive null-guard added to `transform.ts`: when `last_modified` is missing, `daysSinceLastLogin` resolves to `null` instead of `NaN`. Synthetic fixture variant covers the path.
 
-### 1. Wire fixtures into `transform.test.ts`
+## Phase 2 scope — seven implementation pieces
 
-The fixtures exist but no test consumes them. First task: load each fixture and assert the `transformGW2Account` round-trip produces the expected `AccountState` shape. The engaged_committed archetype path needs particular attention because that's what the fixture represents (WvW player, max-level main, recent activity).
+Renumbered after piece #1 (CORS fix) was discovered during manual testing post-PR-#11. Numbering now matches the [PRD 0003 Phase 2 Tracking](https://www.notion.so/36efe492e88e81f28ed6c029a73c1f82) Notion page.
 
-**Critical test case to include**: the PoF-implies-HoT inference path. The fixture's `account.access` array contains `PathOfFire` but NOT `HeartOfThorns`, because PoF bundles HoT in the GW2 expansion model. `transform.ts:25` adds `expansions.hot = true` when `expansions.pof` is true. The test should verify this inference works against real fixture data, not just synthetic.
+### 1. CORS bug fix — move API key + schema version from headers to query params
 
-**Suggested test names**:
-- `engaged_committed fixture round-trips through transformGW2Account`
-- `engaged_committed fixture classifies as engaged_committed via classifyArchetype`
-- `engaged_committed fixture: PoF in access array implies HoT ownership in expansions`
+Discovered during manual testing of PR #11. Entering a real GW2 API key in the browser fails with CORS errors. The GW2 API backend does not support CORS preflight (`OPTIONS`), so any non-safelisted request header forces the browser to preflight and the API rejects it. The current `gw2Fetch` sends `Authorization: Bearer ${apiKey}` and `X-Schema-Version` — each independently triggers preflight.
 
-### 2. Token scope verification via `useGW2TokenInfo`
+**Fix**: pass the API key as `?access_token=KEY` and the schema version as `?v=SCHEMA`, per ArenaNet's documented browser-safe method. `Accept: application/json` is CORS-safelisted and stays. `GW2_SCHEMA_VERSION` stays a constant; only its delivery mechanism changes. Move `lang` to `?lang=` too for consistency (it was a safelisted header, not part of the bug, but unifying makes the "only simple headers" invariant self-evident).
 
-The hook is already defined in `src/api/gw2.ts:74` but unused. Phase 2 wires it into the dispatcher and `/home`.
+**URL construction**: use `new URL(path, GW2_API_BASE)` + `searchParams.set(...)`. Naive string concatenation would clobber paths that already carry a query string (e.g. `/v2/characters?ids=all`).
+
+**Why this jumps the queue**: blocks browser login entirely. The Tauri desktop build is unaffected (native HTTP, no browser CORS enforcement), and the Node-based fixture-capture script was unaffected (no CORS enforcement) — which is why this surfaced only on the web build, after manual testing began. Also unblocks piece #7 (manual integration test).
+
+**Anti-regression**: code comment in `client.ts` explaining the CORS root cause so future-self doesn't "fix" the key back to an `Authorization` header. Unit test that parses the URL passed to `fetch` and asserts `access_token`, `v`, and pre-existing query params (`ids=all`) are all present, plus a negative assertion that `Authorization` and `X-Schema-Version` are absent.
+
+### 2. ~~Wire fixtures into `transform.test.ts` + defensive null-guard~~ — DONE (PR #11)
+
+Closed by [PR #11](https://github.com/Radeax/copper-owl/pull/11). `transform.test.ts` loads the fixtures and asserts the `engaged_committed` round-trip, classifier path, and PoF-implies-HoT inference. `daysSinceLastLogin` resolves to `null` (not `NaN`) when `last_modified` is missing.
+
+### 3. Token scope verification via `useGW2TokenInfo`
+
+The hook is already defined in `src/api/gw2.ts:83` but unused. Phase 2 wires it into the dispatcher and `/home`.
 
 **Approach**: fetch tokeninfo alongside the existing account fetch in `home.tsx` and `index.tsx` (dispatcher). If the response is missing `account`, `characters`, or `progression` scopes, surface a non-blocking warning component on `/home`. Don't block the user; recommendations should still render with whatever scopes are present.
 
@@ -42,7 +55,7 @@ The original PRD copy ("This key is missing the {scope} scope. Some features won
 
 **Use the missing-progression fixture** for testing the missing-scope branch.
 
-### 3. 429 rate-limit handling
+### 4. 429 rate-limit handling
 
 `src/api/client.ts:errorCodeForStatus` returns `'rate_limited'` for 429, but the `Retry-After` header is never read.
 
@@ -53,7 +66,7 @@ The original PRD copy ("This key is missing the {scope} scope. Some features won
 
 The countdown updates every second; reuse the `useReset` pattern from `src/utils/useReset.ts` if useful.
 
-### 4. Network failure UX
+### 5. Network failure UX
 
 TanStack Query already retries up to 2 times on non-4xx errors (per `main.tsx` configuration). What's missing is the post-exhaustion UX.
 
@@ -61,7 +74,7 @@ TanStack Query already retries up to 2 times on non-4xx errors (per `main.tsx` c
 
 Don't blanket-handle this in the global query client — handle in the route so the error UX matches the surface semantics. A blanket toast would feel wrong for the architecture.
 
-### 5. Skeleton loading states
+### 6. Skeleton loading states
 
 Replace the current bare-text loading states in `home.tsx` ("Connecting to the GW2 API…") and `orientation.tsx` ("Loading account data…") with subtle skeleton placeholders matching the eventual content shape.
 
@@ -73,7 +86,7 @@ Keep the text label as a screen-reader announcement (`aria-label` or `<VisuallyH
 
 Reuse `var(--bg-3)` and `var(--border)` from `tokens.css` for the skeleton background and border. Add a subtle pulse animation if it fits — but if it doesn't feel right with the warm palette, drop it. Skeletons shouldn't feel busy.
 
-### 6. Manual integration test
+### 7. Manual integration test
 
 Final step. Use a real GW2 API key in dev:
 
@@ -85,21 +98,17 @@ Final step. Use a real GW2 API key in dev:
 
 Document the manual test results in the PR description, not in repo docs. PR-level evidence is fine for this.
 
-## Phase 1 caveats carried forward
+## Phase 1 caveats — status
 
-Three things flagged in Phase 1 that should land during Phase 2:
+Two closed by piece #2 (PR #11); one still outstanding.
 
-### Defensive null-check on `last_modified`
+### ~~Defensive null-check on `last_modified`~~ — CLOSED (PR #11)
 
-The PR #9 description noted: "Defensive null-check in `transform.ts` for `daysSinceLastLogin` when `last_modified` is missing — currently relies on the pinned schema-version header staying set. A `last_modified ? ... : null` guard (with a widened return type) would be belt-and-suspenders."
+The `last_modified ? ... : null` guard is in `transform.ts` and a synthetic null-variant fixture exercises it.
 
-**Recommendation**: do this during piece #1 (fixture-wiring tests). Add a synthetic fixture variant without `last_modified` to verify the null-handling works. Update `AccountState.daysSinceLastLogin` from `number | null` (it's already nullable in the type) to be set to `null` when source is missing, rather than NaN.
+### ~~Fixtures land but no tests consume them yet~~ — CLOSED (PR #11)
 
-**Why now**: the schema header is configured once and never changes. If a future code change accidentally removes the header (refactor, new fetch function, anyone), the silent NaN bug returns. The defensive guard makes the failure mode visible (null cleanly skips classification thresholds) instead of producing garbage classifications.
-
-### Fixtures land but no tests consume them yet
-
-Phase 1 deliberately split fixtures from the tests that use them for reviewability. Phase 2's piece #1 closes this. If Phase 2 stalls or pauses, the fixtures sit unused — they pass `pnpm test:run` only because nothing references them. Don't let the gap persist long; the longer fixtures sit without tests, the more likely they drift from the engine's actual expectations.
+`transform.test.ts` loads the fixtures and asserts the round-trip + classifier paths.
 
 ### PRD status will need updating on merge
 
@@ -138,9 +147,9 @@ When the next session begins, do these in order:
 3. Read `docs/voice.md` if writing any new prose
 4. Read `docs/pr-review.md` for the review rubric
 5. Check `git status` and `git log --oneline -5` to confirm the starting state
-6. Start with piece #1 (fixture wiring + defensive null-check)
+6. Start with piece #1 (CORS fix). After it merges, move to piece #3 (token scope verification — piece #2 is already done).
 
-After piece #1 lands, the next session has a working test against real fixtures and a defensive guard against the schema-drift bug. That's the foundation for everything else in Phase 2.
+After piece #1 lands, browser login works end-to-end and piece #7's manual integration test is unblocked. That's the foundation for everything else in Phase 2.
 
 ## References
 
