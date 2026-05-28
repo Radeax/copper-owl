@@ -43,7 +43,7 @@ Closed by [PR #11](https://github.com/Radeax/copper-owl/pull/11). `transform.tes
 
 ### 3. Token scope verification via `useGW2TokenInfo`
 
-The hook is already defined in `src/api/gw2.ts:74` but unused. Phase 2 wires it into the dispatcher and `/home`.
+The hook is already defined in `src/api/gw2.ts:83` but unused. Phase 2 wires it into the dispatcher and `/home`.
 
 **Approach**: fetch tokeninfo alongside the existing account fetch in `home.tsx` and `index.tsx` (dispatcher). If the response is missing `account`, `characters`, or `progression` scopes, surface a non-blocking warning component on `/home`. Don't block the user; recommendations should still render with whatever scopes are present.
 
