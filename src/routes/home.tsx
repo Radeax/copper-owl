@@ -8,7 +8,7 @@ import { StatusBand } from '@/components/primitives/StatusBand';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
-import { missingScopes } from '@/api/scopes';
+import { missingScopes, scopeWarningCopy } from '@/api/scopes';
 import { transformGW2Account } from '@/api/transform';
 import styles from './home.module.css';
 
@@ -21,18 +21,6 @@ function isAuthError(err: unknown): boolean {
     err instanceof GW2ApiError &&
     (err.code === 'unauthorized' || err.code === 'forbidden')
   );
-}
-
-function scopeWarningCopy(missing: readonly string[]): string {
-  if (missing.length === 1) {
-    return `This key doesn't include the ${missing[0]} scope. Regenerating with it unlocks the related recommendations; without, they will be skipped.`;
-  }
-  if (missing.length === 2) {
-    return `This key doesn't include the ${missing[0]} and ${missing[1]} scopes. Regenerating with them unlocks the related recommendations; without, they will be skipped.`;
-  }
-  const last = missing[missing.length - 1];
-  const head = missing.slice(0, -1).join(', ');
-  return `This key doesn't include the ${head}, and ${last} scopes. Regenerating with them unlocks the related recommendations; without, they will be skipped.`;
 }
 
 function HomePage() {
@@ -140,6 +128,7 @@ function HomePage() {
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>
           <StatusBand
+            label="API KEY · PERMISSIONS"
             action={
               <>
                 <a
