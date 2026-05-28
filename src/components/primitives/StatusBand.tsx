@@ -6,8 +6,14 @@ interface StatusBandProps {
   action?: ReactNode;
   /**
    * Visual intent. Drives accent color only; structure is identical.
-   * - 'info' (default) — neutral observation (scope warning, rate-limit countdown)
-   * - 'error' — recoverable failure (auth error, network failure)
+   * - 'info' (default) — quiet observation. Scope warning, rate-limit
+   *   countdown, anything the user can keep working through without
+   *   any action.
+   * - 'error' — recoverable failure needing attention. Auth error,
+   *   network failure. Not a catastrophic alarm state — the project
+   *   palette deliberately avoids red. If a true alarm intent is ever
+   *   needed (server down, account banned), add a third value rather
+   *   than escalating the 'error' treatment.
    */
   intent?: 'info' | 'error';
 }

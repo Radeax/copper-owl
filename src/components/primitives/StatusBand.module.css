@@ -2,7 +2,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
 }
 
 .text {
@@ -17,14 +21,16 @@
   gap: 12px;
 }
 
-/*
- * Intent classes — visual accent only. Structure is identical so consumers
- * can swap intents without layout shift. Both currently render identically
- * by design; the prop is plumbed so the 429 countdown, network-failure, and
- * scope-warning pieces of Phase 2 can grow distinct accents without API
- * churn.
- */
-.info,
+/* Quiet observation — scope warning, rate-limit countdown */
+.info {
+  background: var(--bg-3);
+  border-left-color: var(--aether-border);
+}
+
+/* Recoverable failure needing attention — auth error, network failure.
+   Not an alarm — the project palette deliberately avoids red. */
 .error {
-  /* Identical for now; see component JSDoc for the variants' semantic intent. */
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  border-left-color: var(--gold);
 }
