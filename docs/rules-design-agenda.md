@@ -34,7 +34,7 @@ A rule function needs to:
 
 **Design questions**:
 - Hand-written conditionals per rule, or a shared scoring model (each candidate scores on relevance / timeliness / reward, top N win), or a mix?
-- The PRD-0001 playstyle modifier and PRD-0002 mastery-gate awareness both plug in here — they change which candidates score high. The selection model should accommodate them cleanly rather than special-casing.
+- The PRD 0001 playstyle modifier and PRD 0002 mastery-gate awareness both plug in here — they change which candidates score high. The selection model should accommodate them cleanly rather than special-casing.
 - Where does reset-awareness factor in? A reset-imminent window should bump time-sensitive candidates (dailies) up the ranking, but only within the 30-min window per voice principle 6.
 
 This is worth designing deliberately rather than letting it emerge ad hoc, because every rule will use whatever pattern the first few rules establish.
@@ -118,6 +118,7 @@ Not all in one session. The first session should prioritize: which threads block
 - docs/voice.md — the 9 voice principles all rule prose follows
 - docs/product/0001-playstyle-preference.md — selection modifier
 - docs/product/0002-mastery-gates.md — factor + recommendation type
+- docs/product/0004-living-world-ownership.md — deferred factor (Living World ownership)
 - src/engine/rules/ — the plug-in mechanism (types, registry, example placeholders)
 - src/engine/rules/README.md — the public-facing rule API doc
 - .github/ISSUE_TEMPLATE/rule.md — the rule issue template
