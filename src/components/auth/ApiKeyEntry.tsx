@@ -69,7 +69,11 @@ export function ApiKeyEntry({ onSuccess }: Props) {
         >
           Generate one at account.arena.net
         </a>{' '}
-        — revocable from that same page at any time.
+        and enable the <strong className={styles.hintStrong}>account</strong>,{' '}
+        <strong className={styles.hintStrong}>characters</strong>, and{' '}
+        <strong className={styles.hintStrong}>progression</strong> permissions —
+        they can&rsquo;t be changed after the key is created, so check all three.
+        Revocable from that same page at any time.
       </p>
     </form>
   );
