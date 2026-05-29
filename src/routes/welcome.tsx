@@ -19,10 +19,7 @@ function WelcomePage() {
           <span className={styles.brandName}>COPPER OWL</span>
         </div>
         <h1 className={styles.title}>What should you do next?</h1>
-        <p className={styles.sub}>
-          A calm companion for Guild Wars 2. Tells you what to focus on this session, why it
-          matters, and what you can skip without guilt.
-        </p>
+        <p className={styles.sub}>Not sure where to start? Here&apos;s what&apos;s worth your session.</p>
       </header>
 
       <section className={styles.modes}>
