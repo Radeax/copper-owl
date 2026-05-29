@@ -13,6 +13,12 @@
   --bg-3: #252524;
   --bg-4: #0c0c0b;
 
+  /* ─── Purpose-named surfaces ─── */
+  /* Info-state status band fill. Lifted above --bg-3 so the band reads as a
+     discrete zone against the page background. Cool-shifted by a few units
+     to harmonize with the aether left-accent the info intent uses. */
+  --bg-status-info: #2f3230;
+
   /* ─── Borders ─── */
   --border: #2e2e2c;
   --border-2: #1f1f1d;

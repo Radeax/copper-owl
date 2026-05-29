@@ -4,9 +4,11 @@ import { recommend } from '@/engine/recommend';
 import { useReset } from '@/utils/useReset';
 import { RecommendationCard } from '@/components/cards/RecommendationCard';
 import { ResetClock } from '@/components/cards/ResetClock';
+import { StatusBand } from '@/components/primitives/StatusBand';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
-import { useGW2Account, useGW2Characters } from '@/api/gw2';
+import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
+import { missingScopes, scopeWarningCopy } from '@/api/scopes';
 import { transformGW2Account } from '@/api/transform';
 import styles from './home.module.css';
 
@@ -42,6 +44,12 @@ function HomePage() {
   // API queries are disabled when apiKey is undefined (anonymous mode).
   const accountQuery = useGW2Account(isAnonymous ? undefined : apiKey);
   const charsQuery = useGW2Characters(isAnonymous ? undefined : apiKey);
+  const tokenQuery = useGW2TokenInfo(isAnonymous ? undefined : apiKey);
+
+  const missing = useMemo(
+    () => (tokenQuery.data ? missingScopes(tokenQuery.data.permissions) : []),
+    [tokenQuery.data]
+  );
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -66,8 +74,8 @@ function HomePage() {
     if (accountQuery.isLoading || charsQuery.isLoading) {
       return (
         <div className={styles.page}>
-          <div className={styles.statusBand}>
-            <p className={styles.statusText}>Connecting to the GW2 API…</p>
+          <div className={styles.authErrorWrap}>
+            <StatusBand>Connecting to the GW2 API…</StatusBand>
           </div>
         </div>
       );
@@ -76,19 +84,23 @@ function HomePage() {
     if (isAuthError(accountQuery.error) || isAuthError(charsQuery.error)) {
       return (
         <div className={styles.page}>
-          <div className={styles.statusBand}>
-            <p className={styles.statusText}>
-              The API key did not authenticate. A different key may resolve this.
-            </p>
-            <button
-              className={styles.retryLink}
-              onClick={() => {
-                signOut();
-                void navigate({ to: '/welcome' });
-              }}
+          <div className={styles.authErrorWrap}>
+            <StatusBand
+              intent="error"
+              action={
+                <button
+                  className={styles.linkAction}
+                  onClick={() => {
+                    signOut();
+                    void navigate({ to: '/welcome' });
+                  }}
+                >
+                  Try a different key
+                </button>
+              }
             >
-              Try a different key
-            </button>
+              The API key did not authenticate. A different key may resolve this.
+            </StatusBand>
           </div>
         </div>
       );
@@ -112,6 +124,37 @@ function HomePage() {
           <span className={styles.archetype}>{archetype.replace(/_/g, ' ')}</span>
         </p>
       </header>
+
+      {!isAnonymous && missing.length > 0 && (
+        <div className={styles.scopeWarnWrap}>
+          <StatusBand
+            label="API KEY · PERMISSIONS"
+            action={
+              <>
+                <a
+                  className={styles.linkAction}
+                  href="https://account.arena.net/applications"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Manage API keys
+                </a>
+                <button
+                  className={styles.linkAction}
+                  onClick={() => {
+                    signOut();
+                    void navigate({ to: '/welcome' });
+                  }}
+                >
+                  Use a different key
+                </button>
+              </>
+            }
+          >
+            {scopeWarningCopy(missing)}
+          </StatusBand>
+        </div>
+      )}
 
       <section className={styles.clockBand}>
         <ResetClock />

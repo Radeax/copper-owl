@@ -80,22 +80,15 @@
   text-decoration-color: var(--muted);
 }
 
-.statusBand {
+.authErrorWrap {
   margin-top: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
 }
 
-.statusText {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.55;
-  margin: 0;
+.scopeWarnWrap {
+  margin-bottom: 24px;
 }
 
-.retryLink {
+.linkAction {
   background: none;
   border: none;
   padding: 0;
@@ -107,7 +100,7 @@
   text-decoration-color: var(--gold-border);
 }
 
-.retryLink:hover {
+.linkAction:hover {
   color: var(--text);
   text-decoration-color: var(--muted);
 }

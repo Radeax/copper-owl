@@ -1,0 +1,58 @@
+.band {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+}
+
+/* Eyebrow label — visual grammar shared with RecommendationCard.eyebrow
+   (10.5px / 700 / 0.07em / uppercase) so status bands read as peers to
+   recommendation cards. Always gold; the band intent variants distinguish
+   themselves via background + border accent, not label color. */
+.label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0;
+}
+
+.text {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.action {
+  display: flex;
+  gap: 12px;
+}
+
+/* Center-dot separator between multi-action children. Generalises to any
+   band with two or more action items without consumers having to author
+   the separator. */
+.action > *:not(:first-child)::before {
+  content: '·';
+  margin-right: 12px;
+  color: var(--muted);
+}
+
+/* Quiet observation — scope warning, rate-limit countdown */
+.info {
+  background: var(--bg-status-info);
+  border-left-color: var(--aether-border);
+}
+
+/* Recoverable failure needing attention — auth error, network failure.
+   Not an alarm — the project palette deliberately avoids red. */
+.error {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  border-left-color: var(--gold);
+}

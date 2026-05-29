@@ -46,10 +46,14 @@
   color: var(--dim);
 }
 
+/* Weight reduced from 600 → 500 so the time reads as ambient reference,
+   not a primary decision driver competing with RecommendationCard titles
+   (which sit at 18px / 600). Size preserved so the grid layout doesn't
+   shift. */
 .value {
   font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
@@ -57,7 +61,7 @@
 .valueMuted {
   font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
