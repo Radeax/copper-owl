@@ -83,6 +83,15 @@
   line-height: 1.6;
 }
 
+/* Inline emphasis for the three required permission names — brighter than
+   the surrounding --dim hint text so they stay scannable. Not a new visual
+   pattern: just lifts the existing hint color toward --text at a heavier
+   weight, the same way prose elsewhere emphasizes a key term. */
+.hintStrong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .hintLink {
   color: var(--muted);
   text-decoration: underline;
