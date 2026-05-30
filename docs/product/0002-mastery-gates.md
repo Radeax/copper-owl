@@ -59,7 +59,7 @@ Voice principle reminder: third-person observational. "The next chapter needs Up
 ## Dependencies
 
 - PRD 0003 (real GW2 API integration) — must land first to make /v2/account/masteries fetch real data
-- PRD 0001 (playstyle preference) — landed; this PRD's recommendations will consult playstyle for framing
+- PRD 0001 (playstyle preference) — proposed; not yet implemented (issue #8); this PRD's recommendations will consult playstyle for framing
 
 ## Effort estimate
 
