@@ -99,6 +99,76 @@ This principle is informed by player psychology research showing that perceived 
 - **Time-of-day assumptions.** Anything with "tonight," "this evening," "before bed" → "this session."
 - **"You should."** Almost always replaceable with the observation that motivates the should.
 
+## User-facing positioning (distinct from recommendation voice)
+
+The principles above govern how recommendations *sound* in the app. This
+section governs how Copper Owl is *introduced* — the welcome screen, and any
+future landing page, store listing, or outreach copy. Different reader,
+different job.
+
+### What the research found
+
+Community language analysis of players who feel stuck in GW2 (new,
+returning, and veteran) shows a consistent pattern. The dominant framing, in
+players' own words, is **being lost** — "completely lost," "don't know where
+to start," "what do I do now?" The close second is **volume overwhelm** —
+"too much to do," "ten years of content," "overwhelmed." These two fuse: the
+player isn't just disoriented, they feel buried by options. The moment
+confusion turns into intent is when they ask someone to **just tell them what
+to do / what to prioritize**.
+
+The most adoptable audience is the **returning/lapsed player**: they have
+prior game knowledge but return to an ecosystem that grew during their
+absence, and no existing tool is aimed at their re-orientation. (Engaged
+veterans feel the pain too but already self-serve with existing tools;
+brand-new players need a tutorial more than a session director.)
+
+### The vocabulary rules
+
+Use the player's own words: **lost, where to start, what's worth, what to
+do, this session, overwhelmed, too much.**
+
+Avoid words players DON'T use for this pain — they read as the very burden
+they're escaping: **"research," "optimize," "maximize," "track," "data,"
+"efficiency."** Players call looking things up "homework" or "Wiki Wars,"
+not "research." Don't sell them more homework.
+
+Avoid "calm" as a pitch word. Calm is how the product *feels* (the voice,
+the unhurried UI, the no-red palette) — a retention quality, not an
+acquisition hook. Nobody arrives shopping for a calmer tool; they arrive
+not knowing what to play. Show calm; don't announce it.
+
+### The hierarchy
+
+1. **Lead with relief from being lost / overwhelmed**, resolved into a clear
+   next step. That's the primary pain and the product's core promise.
+2. **Session-scope the promise.** The answer is for *this* session, not a
+   life plan — and session-scoping is the mechanism that shrinks an
+   overwhelming backlog into a doable answer. "This session" also stays
+   timezone-neutral (see principle #2). Keep "session" as the scope of the
+   answer, not the lead word — players feel "lost," not "un-optimized."
+3. **"Skip without guilt" is a supporting beat, not the hook.** It's
+   distinctive but addresses a secondary feeling (FOMO/guilt is real but
+   niche, concentrated among completionist veterans).
+
+### In-app vs. external copy
+
+- **In-app** (welcome screen): the reader already opened the app. The line
+  should *orient* — gently resolve the "where do I start" feeling. Quieter,
+  closer to the observational voice.
+  ✅ "Not sure where to start? Here's what's worth your session."
+- **External** (landing/store/outreach): the reader is deciding whether to
+  try it. The line can name the pain and the audience harder, for fast
+  "this is for me" recognition.
+  ✅ "Too much to do, no idea where to start? Copper Owl sorts your session."
+  ❌ "A calm companion for Guild Wars 2." (leads on internal design value,
+     not the reader's pain)
+
+This connects to principle #9: the same "players want to be told what to do,
+with freedom to deviate" insight that makes recommendations directive also
+makes the pitch "direction, when you're lost" — not "more options" and not
+"a calmer experience."
+
 ## When in doubt
 
 Read the prose out loud as if a 50-year-old librarian were saying it. If it sounds wrong in that voice, it probably is.

@@ -2,7 +2,7 @@
 
 > Tells GW2 players what to do next, why it matters, and what they can skip.
 
-A calm decision-support companion for Guild Wars 2. An information layer over the public GW2 API — no FOMO, no first-person narration, no guilt for skipping things. Field-guide voice, mentor tone.
+A decision-support companion for Guild Wars 2. An information layer over the public GW2 API — no FOMO, no first-person narration, no guilt for skipping things. Field-guide voice, mentor tone.
 
 Built as a free, non-commercial fan tool. Not affiliated with or endorsed by ArenaNet or NCSoft.
 
