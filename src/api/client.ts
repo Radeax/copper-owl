@@ -57,11 +57,16 @@ export class GW2ApiError extends Error {
  * delta-seconds form (e.g. "30"), which is all we handle here. The RFC also
  * permits an HTTP-date form; GW2 doesn't use it, so it's intentionally left
  * unparsed (returns undefined) rather than adding date math we'd never exercise.
+ *
+ * delta-seconds is 1*DIGIT — a non-negative integer. We match that exactly
+ * rather than lean on Number(), which would also accept scientific ("1e3"),
+ * hex ("0x10"), signed, and fractional forms; a header in any of those shapes
+ * is malformed and should fall back to the caller's default, not be trusted.
  */
 function parseRetryAfter(raw: string | null): number | undefined {
-  if (!raw) return undefined;
-  const seconds = Number(raw);
-  return Number.isFinite(seconds) && seconds >= 0 ? seconds : undefined;
+  if (!raw || !/^\d+$/.test(raw.trim())) return undefined;
+  const seconds = Number(raw.trim());
+  return Number.isFinite(seconds) ? seconds : undefined;
 }
 
 export interface FetchOptions {

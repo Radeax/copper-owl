@@ -161,6 +161,26 @@ describe('gw2Fetch — 429 Retry-After handling', () => {
     expect(err.retryAfterSeconds).toBeUndefined();
   });
 
+  // delta-seconds is 1*DIGIT; the numeric forms Number() tolerates are not
+  // valid headers and must fall back to the default, not be trusted as delays.
+  it.each(['1e3', '0x10', '1.5', '+30', '-5', ' ', 'NaN', 'Infinity'])(
+    'rejects the malformed Retry-After value %j',
+    async (value) => {
+      mockErrorResponse(429, value);
+      const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+      expect(err.code).toBe('rate_limited');
+      expect(err.retryAfterSeconds).toBeUndefined();
+    }
+  );
+
+  it('parses a Retry-After value with surrounding whitespace', async () => {
+    mockErrorResponse(429, '  45  ');
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err.retryAfterSeconds).toBe(45);
+  });
+
   it('does not attach retryAfterSeconds to non-429 errors', async () => {
     // A 500 with a stray Retry-After header should not surface a countdown.
     mockErrorResponse(500, '30');

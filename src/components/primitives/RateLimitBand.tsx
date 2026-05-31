@@ -57,12 +57,16 @@ export function RateLimitBand({ retryAfterSeconds, onRetry }: RateLimitBandProps
     <StatusBand
       intent="info"
       action={
-        <span className={styles.countdown}>
+        // aria-hidden keeps the per-second countdown out of StatusBand's
+        // role="status" live region — otherwise a screen reader re-announces
+        // the whole band every tick. The static body below is the announced
+        // status; the ticking value is a visual affordance only.
+        <span className={styles.countdown} aria-hidden="true">
           {remaining > 0 ? `Retrying in ${formatCountdown(remaining)}` : 'Retrying…'}
         </span>
       }
     >
-      Rate limit hit. The API is pacing requests.
+      Rate limit hit. The API is pacing requests. Recommendations refresh automatically.
     </StatusBand>
   );
 }

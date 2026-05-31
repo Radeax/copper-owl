@@ -73,6 +73,8 @@ describe('RateLimitBand', () => {
     render(<RateLimitBand retryAfterSeconds={5} onRetry={vi.fn()} />);
 
     const band = screen.getByRole('status');
-    expect(band).toHaveTextContent('Rate limit hit. The API is pacing requests.');
+    expect(band).toHaveTextContent(
+      'Rate limit hit. The API is pacing requests. Recommendations refresh automatically.'
+    );
   });
 });
