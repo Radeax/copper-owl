@@ -6,12 +6,17 @@
    Subtle and slow so the skeleton reads as "loading" rather than "frozen" —
    the app is otherwise still, so this is deliberately low-contrast and
    unhurried. Off entirely for anyone who prefers reduced motion. */
+/* Base hook so `composes: pulse` resolves; the animation + its will-change
+   hint live in the media query so they apply only when the pulse actually
+   runs. With reduced motion, there's no animation to optimize, so promoting
+   every bar to its own layer would be wasted memory/paint. */
 .pulse {
-  will-change: opacity;
+  /* intentionally empty — see the reduced-motion block below */
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .pulse {
+    will-change: opacity;
     animation: skeletonPulse 1.6s ease-in-out infinite;
   }
 }
