@@ -29,6 +29,7 @@ interface RateLimitBandProps {
 export function RateLimitBand({ retryAfterSeconds, onRetry }: RateLimitBandProps) {
   const [remaining, setRemaining] = useState(retryAfterSeconds);
   const intervalRef = useRef<number | undefined>(undefined);
+  const firedRef = useRef(false);
 
   // One interval for the band's life — a single setInterval ticks reliably,
   // where a per-tick rescheduled timeout would not. Math.max keeps it from
@@ -41,10 +42,12 @@ export function RateLimitBand({ retryAfterSeconds, onRetry }: RateLimitBandProps
   }, []);
 
   // Land on zero once: stop the interval and fire the retry the copy promises.
-  // remaining holds at zero and onRetry is stable (React Compiler), so this
-  // does not re-run until a fresh 429 remounts the band.
+  // firedRef makes "once per mount" intrinsic — it does not depend on the
+  // caller keeping onRetry referentially stable. A fresh 429 remounts the
+  // band (keyed on errorUpdatedAt), resetting the guard for the next cycle.
   useEffect(() => {
-    if (remaining === 0) {
+    if (remaining === 0 && !firedRef.current) {
+      firedRef.current = true;
       window.clearInterval(intervalRef.current);
       onRetry();
     }

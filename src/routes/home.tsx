@@ -69,11 +69,12 @@ function HomePage() {
   // countdown rather than leaving it stuck at zero.
   const throttleQuery = isAnonymous
     ? undefined
-    : [accountQuery, charsQuery].find((q) => isRateLimited(q.error));
+    : [accountQuery, charsQuery, tokenQuery].find((q) => isRateLimited(q.error));
   const throttle = throttleQuery?.error as GW2ApiError | undefined;
   const retryThrottled = () => {
     void accountQuery.refetch();
     void charsQuery.refetch();
+    void tokenQuery.refetch();
   };
 
   const throttleBand = throttle ? (
