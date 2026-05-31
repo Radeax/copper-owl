@@ -64,23 +64,29 @@ function HomePage() {
     [tokenQuery.data]
   );
 
-  // The query (if any) currently holding a 429. errorUpdatedAt changes on each
-  // fresh throttle — used as the band's key so a repeat 429 restarts the
-  // countdown rather than leaving it stuck at zero.
-  const throttleQuery = isAnonymous
-    ? undefined
-    : [accountQuery, charsQuery, tokenQuery].find((q) => isRateLimited(q.error));
-  const throttle = throttleQuery?.error as GW2ApiError | undefined;
+  // Every mounted query currently holding a 429. They share one rate-limit
+  // bucket (the gw2Queue), so a throttle usually hits all three at once.
+  const throttledQueries = isAnonymous
+    ? []
+    : [accountQuery, charsQuery, tokenQuery].filter((q) => isRateLimited(q.error));
   const retryThrottled = () => {
     void accountQuery.refetch();
     void charsQuery.refetch();
     void tokenQuery.refetch();
   };
 
-  const throttleBand = throttle ? (
+  // Seed from the *longest* active Retry-After: retryThrottled refetches all of
+  // them, so counting down to the shortest would jump a longer query's window
+  // before it elapsed. Re-key on the latest error so a fresh 429 restarts the
+  // countdown rather than leaving it stuck at zero.
+  const throttleBand = throttledQueries.length > 0 ? (
     <RateLimitBand
-      key={throttleQuery?.errorUpdatedAt}
-      retryAfterSeconds={throttle.retryAfterSeconds ?? DEFAULT_RETRY_AFTER_SECONDS}
+      key={Math.max(...throttledQueries.map((q) => q.errorUpdatedAt))}
+      retryAfterSeconds={Math.max(
+        ...throttledQueries.map(
+          (q) => (q.error as GW2ApiError).retryAfterSeconds ?? DEFAULT_RETRY_AFTER_SECONDS
+        )
+      )}
       onRetry={retryThrottled}
     />
   ) : null;
