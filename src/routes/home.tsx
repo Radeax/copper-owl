@@ -5,6 +5,7 @@ import { useReset } from '@/utils/useReset';
 import { RecommendationCard } from '@/components/cards/RecommendationCard';
 import { ResetClock } from '@/components/cards/ResetClock';
 import { StatusBand } from '@/components/primitives/StatusBand';
+import { RateLimitBand } from '@/components/primitives/RateLimitBand';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
@@ -22,6 +23,18 @@ function isAuthError(err: unknown): boolean {
     (err.code === 'unauthorized' || err.code === 'forbidden')
   );
 }
+
+function isRateLimited(err: unknown): err is GW2ApiError {
+  return err instanceof GW2ApiError && err.code === 'rate_limited';
+}
+
+/**
+ * Fallback countdown when a 429 arrives without a Retry-After header — GW2's
+ * rate-limit window is roughly per-minute, so 60s is a safe automatic retry
+ * delay. The gw2Queue already paces requests, so an over-long wait here only
+ * delays the refetch; it never causes a second throttle.
+ */
+const DEFAULT_RETRY_AFTER_SECONDS = 60;
 
 function HomePage() {
   const navigate = useNavigate();
@@ -50,6 +63,26 @@ function HomePage() {
     () => (tokenQuery.data ? missingScopes(tokenQuery.data.permissions) : []),
     [tokenQuery.data]
   );
+
+  // The query (if any) currently holding a 429. errorUpdatedAt changes on each
+  // fresh throttle — used as the band's key so a repeat 429 restarts the
+  // countdown rather than leaving it stuck at zero.
+  const throttleQuery = isAnonymous
+    ? undefined
+    : [accountQuery, charsQuery].find((q) => isRateLimited(q.error));
+  const throttle = throttleQuery?.error as GW2ApiError | undefined;
+  const retryThrottled = () => {
+    void accountQuery.refetch();
+    void charsQuery.refetch();
+  };
+
+  const throttleBand = throttle ? (
+    <RateLimitBand
+      key={throttleQuery?.errorUpdatedAt}
+      retryAfterSeconds={throttle.retryAfterSeconds ?? DEFAULT_RETRY_AFTER_SECONDS}
+      onRetry={retryThrottled}
+    />
+  ) : null;
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -105,6 +138,16 @@ function HomePage() {
         </div>
       );
     }
+
+    // No cached account to fall back on — the throttle band stands in for the
+    // page until the retry lands, structurally parallel to the loading state.
+    if (throttleBand && !account) {
+      return (
+        <div className={styles.page}>
+          <div className={styles.authErrorWrap}>{throttleBand}</div>
+        </div>
+      );
+    }
   }
 
   if (!account) return null;
@@ -124,6 +167,10 @@ function HomePage() {
           <span className={styles.archetype}>{archetype.replace(/_/g, ' ')}</span>
         </p>
       </header>
+
+      {throttleBand && (
+        <div className={styles.scopeWarnWrap}>{throttleBand}</div>
+      )}
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>

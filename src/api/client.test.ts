@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { gw2Fetch } from './client';
+import { gw2Fetch, GW2ApiError } from './client';
 
 /**
  * These tests pin the CORS contract documented above gw2Fetch in client.ts:
@@ -100,5 +100,73 @@ describe('gw2Fetch — CORS contract', () => {
 
     expect(url.origin).toBe('https://api.guildwars2.com');
     expect(url.pathname).toBe('/v2/account');
+  });
+});
+
+/** Await a gw2Fetch call expected to reject, returning the typed error. */
+async function captureError(p: Promise<unknown>): Promise<GW2ApiError> {
+  try {
+    await p;
+  } catch (e) {
+    return e as GW2ApiError;
+  }
+  throw new Error('expected gw2Fetch to reject, but it resolved');
+}
+
+/**
+ * Mock an error response with a controllable Retry-After header. The header
+ * getter is case-insensitive on a real Headers object; the production code
+ * reads 'Retry-After', so the mock keys on that exact name.
+ */
+function mockErrorResponse(status: number, retryAfter: string | null = null) {
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: false,
+    status,
+    statusText: 'Too Many Requests',
+    headers: { get: (name: string) => (name === 'Retry-After' ? retryAfter : null) },
+    json: vi.fn().mockResolvedValue({ text: 'too many requests' }),
+  } as unknown as Response);
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+describe('gw2Fetch — 429 Retry-After handling', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('parses Retry-After seconds into GW2ApiError.retryAfterSeconds on a 429', async () => {
+    mockErrorResponse(429, '30');
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err).toBeInstanceOf(GW2ApiError);
+    expect(err.code).toBe('rate_limited');
+    expect(err.retryAfterSeconds).toBe(30);
+  });
+
+  it('leaves retryAfterSeconds undefined when a 429 carries no Retry-After header', async () => {
+    mockErrorResponse(429, null);
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err).toBeInstanceOf(GW2ApiError);
+    expect(err.code).toBe('rate_limited');
+    expect(err.retryAfterSeconds).toBeUndefined();
+  });
+
+  it('ignores an unparseable Retry-After value', async () => {
+    mockErrorResponse(429, 'Wed, 21 Oct 2026 07:28:00 GMT');
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err.retryAfterSeconds).toBeUndefined();
+  });
+
+  it('does not attach retryAfterSeconds to non-429 errors', async () => {
+    // A 500 with a stray Retry-After header should not surface a countdown.
+    mockErrorResponse(500, '30');
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err.code).toBe('server');
+    expect(err.retryAfterSeconds).toBeUndefined();
   });
 });
