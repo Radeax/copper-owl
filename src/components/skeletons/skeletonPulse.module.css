@@ -1,0 +1,27 @@
+/* Shared skeleton pulse. Composed into the placeholder bars of both
+   HomeSkeleton and OrientationSkeleton so the timing + keyframes live in one
+   place. Carries only the animation (not fill/radius) so each skeleton's local
+   size and border-radius rules keep their existing cascade.
+
+   Subtle and slow so the skeleton reads as "loading" rather than "frozen" —
+   the app is otherwise still, so this is deliberately low-contrast and
+   unhurried. Off entirely for anyone who prefers reduced motion. */
+.pulse {
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulse {
+    animation: skeletonPulse 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

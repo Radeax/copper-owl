@@ -7,6 +7,7 @@ import { ResetClock } from '@/components/cards/ResetClock';
 import { StatusBand } from '@/components/primitives/StatusBand';
 import { RateLimitBand } from '@/components/primitives/RateLimitBand';
 import { NetworkErrorBand } from '@/components/primitives/NetworkErrorBand';
+import { HomeSkeleton } from '@/components/skeletons/HomeSkeleton';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
@@ -155,9 +156,7 @@ function HomePage() {
     if (accountQuery.isLoading || charsQuery.isLoading) {
       return (
         <div className={styles.page}>
-          <div className={styles.authErrorWrap}>
-            <StatusBand>Connecting to the GW2 API…</StatusBand>
-          </div>
+          <HomeSkeleton />
         </div>
       );
     }

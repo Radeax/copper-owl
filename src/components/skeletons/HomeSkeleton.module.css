@@ -1,0 +1,138 @@
+/* Skeleton placeholder for /home. Container boxes are outlined with --border
+   (transparent fill, so the page backdrop shows through); the placeholder bars
+   are filled with --bg-3 so they read against both the page and the outlines.
+   Spacing mirrors home.module.css so the loaded content lands where the
+   skeleton sat. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ─── */
+.head {
+  margin-bottom: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.brandMark {
+  font-size: 22px;
+  opacity: 0.85;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ─── Placeholder bar (the only filled element) ─── */
+.bar {
+  composes: pulse from './skeletonPulse.module.css';
+  background: var(--bg-3);
+  border-radius: 6px;
+}
+
+.titleBar {
+  height: 26px;
+  width: 72%;
+  margin-bottom: 9px;
+}
+
+.accountBar {
+  height: 13px;
+  width: 42%;
+}
+
+/* ─── Reset-clock band (mirrors ResetClock.module.css) ─── */
+.clock {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.clockRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clockLabel {
+  height: 11px;
+  width: 120px;
+}
+
+.clockValue {
+  height: 17px;
+  width: 72px;
+}
+
+.clockLabelSm {
+  height: 10px;
+  width: 92px;
+}
+
+.clockValueSm {
+  height: 13px;
+  width: 56px;
+}
+
+/* ─── Recommendation cards (mirrors RecommendationCard.module.css) ─── */
+.recs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow {
+  height: 10px;
+  width: 34%;
+}
+
+.cardTitle {
+  height: 18px;
+  width: 80%;
+}
+
+.line {
+  height: 13px;
+  width: 100%;
+}
+
+.lineShort {
+  height: 13px;
+  width: 62%;
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tag {
+  height: 16px;
+  width: 64px;
+  border-radius: 4px;
+}

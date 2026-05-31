@@ -5,6 +5,7 @@ import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
 import { transformGW2Account } from '@/api/transform';
+import { OrientationSkeleton } from '@/components/skeletons/OrientationSkeleton';
 import type { AccountState } from '@/types/domain';
 
 import { OpenWorldMode } from '@/illustrations/OpenWorldMode';
@@ -110,9 +111,7 @@ function OrientationPage() {
     return (
       <div className={styles.page}>
         <BrandHeader />
-        <div className={styles.statusBand}>
-          <p className={styles.statusText}>Loading account data…</p>
-        </div>
+        <OrientationSkeleton />
       </div>
     );
   }
