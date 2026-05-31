@@ -1,0 +1,165 @@
+/* Skeleton placeholder for /orientation, below the real BrandHeader. Container
+   boxes are outlined with --border (transparent fill); placeholder bars and
+   illustration blocks are filled with --bg-3. Spacing mirrors
+   orientation.module.css's hero + section so the resolved view lands in place.
+   Only the above-the-fold hero + one section are mirrored — see the component
+   doc for why. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  composes: pulse from './skeletonPulse.module.css';
+  background: var(--bg-3);
+  border-radius: 6px;
+}
+
+/* ─── Hero (mirrors orientation .hero) ─── */
+.hero {
+  padding: max(24px, var(--safe-top)) 0 18px;
+}
+
+.heroEyebrow {
+  height: 11px;
+  width: 48%;
+  margin-bottom: 9px;
+}
+
+.heroTitle {
+  height: 30px;
+  width: 88%;
+  margin-bottom: 12px;
+}
+
+.heroSub {
+  height: 14px;
+  width: 100%;
+  margin-bottom: 7px;
+}
+
+.heroSubShort {
+  height: 14px;
+  width: 70%;
+}
+
+/* ─── Section (mirrors orientation .section / .sectionHeader) ─── */
+.section {
+  padding: 22px 0 10px;
+}
+
+.sectionHeader {
+  margin-bottom: 13px;
+}
+
+.sectionLabel {
+  height: 11px;
+  width: 180px;
+  margin-bottom: 6px;
+}
+
+.sectionSub {
+  height: 11px;
+  width: 130px;
+}
+
+/* ─── Primary card (mirrors orientation .primary) ─── */
+.primary {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Matches the real .primaryIllustration banner height (68px, 80px ≥768px) so
+   the resolved card lands where the skeleton sat. */
+.primaryIllustration {
+  height: 68px;
+  width: 100%;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .primaryIllustration {
+    height: 80px;
+  }
+}
+
+/* Matches the real .primaryBody padding (18px 20px 20px, 20px 22px 22px
+   ≥768px). */
+.primaryBody {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+@media (min-width: 768px) {
+  .primaryBody {
+    padding: 20px 22px 22px;
+  }
+}
+
+.cardTitle {
+  height: 18px;
+  width: 72%;
+}
+
+.line {
+  height: 13px;
+  width: 100%;
+}
+
+.lineShort {
+  height: 13px;
+  width: 60%;
+}
+
+/* ─── Alternative rows (mirrors orientation .alt) ─── */
+/* The real alt row is a full-height image strip flush to the left edge + a
+   padded content block, all clipped by the row's border-radius — not a padded
+   container with an inset square. Matching that shape keeps the resolved cards
+   from jumping when they replace the skeleton. */
+.alts {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.alt {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.altImage {
+  width: 74px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-2);
+  /* Override the composed .bar radius — this is a flush strip clipped by the
+     row's overflow:hidden, not a rounded box. */
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .altImage {
+    width: 90px;
+  }
+}
+
+.altContent {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.altTitle {
+  height: 14px;
+  width: 50%;
+}
