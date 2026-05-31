@@ -190,3 +190,54 @@ describe('gw2Fetch — 429 Retry-After handling', () => {
     expect(err.retryAfterSeconds).toBeUndefined();
   });
 });
+
+/**
+ * Error classification underpins how /home branches: the network-failure band
+ * (piece #5) keys on code 'network' OR 'server', the 429 countdown on
+ * 'rate_limited', and the auth band on 'unauthorized'/'forbidden'. Pin each
+ * code to its trigger so a misclassification can't silently route a failure to
+ * the wrong band (or to a blank page).
+ */
+describe('gw2Fetch — error classification', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('classifies a rejected fetch as a network error with status 0', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err).toBeInstanceOf(GW2ApiError);
+    expect(err.code).toBe('network');
+    expect(err.status).toBe(0);
+  });
+
+  it('re-throws an AbortError as-is rather than wrapping it as network', async () => {
+    const abort = Object.assign(new Error('aborted'), { name: 'AbortError' });
+    const fetchMock = vi.fn().mockRejectedValue(abort);
+    vi.stubGlobal('fetch', fetchMock);
+
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err).not.toBeInstanceOf(GW2ApiError);
+    expect(err.name).toBe('AbortError');
+  });
+
+  it.each([
+    [401, 'unauthorized'],
+    [403, 'forbidden'],
+    [429, 'rate_limited'],
+    [500, 'server'],
+    [503, 'server'],
+    [404, 'unknown'],
+  ])('classifies HTTP %i as code %s', async (status, code) => {
+    mockErrorResponse(status);
+    const err = await captureError(gw2Fetch('/v2/account', { apiKey: 'KEY' }));
+
+    expect(err.code).toBe(code);
+    expect(err.status).toBe(status);
+  });
+});

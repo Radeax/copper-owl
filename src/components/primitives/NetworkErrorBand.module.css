@@ -1,0 +1,22 @@
+/* Retry action in the band's action slot. Mirrors home.module.css .linkAction
+   (gold underlined button) so the manual retry reads as a peer to the auth
+   band's "Try a different key". The link-button treatment now recurs across
+   the auth, scope, and network bands — a candidate to lift into a shared
+   band-action primitive in the issue #21 cleanup pass. */
+.retry {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--gold-border);
+}
+
+.retry:hover {
+  color: var(--text);
+  text-decoration-color: var(--muted);
+}

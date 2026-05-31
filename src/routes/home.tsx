@@ -6,6 +6,7 @@ import { RecommendationCard } from '@/components/cards/RecommendationCard';
 import { ResetClock } from '@/components/cards/ResetClock';
 import { StatusBand } from '@/components/primitives/StatusBand';
 import { RateLimitBand } from '@/components/primitives/RateLimitBand';
+import { NetworkErrorBand } from '@/components/primitives/NetworkErrorBand';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
@@ -26,6 +27,18 @@ function isAuthError(err: unknown): boolean {
 
 function isRateLimited(err: unknown): err is GW2ApiError {
   return err instanceof GW2ApiError && err.code === 'rate_limited';
+}
+
+/**
+ * A failure where the data the page needs didn't arrive but retrying might fix
+ * it: a rejected fetch (offline, DNS, timeout → code 'network') or a GW2 5xx
+ * (code 'server'). Distinct from 429 (transient, self-resolving — RateLimitBand)
+ * and auth (401/403 — a bad key, retrying won't help). TanStack Query retries
+ * both up to twice (neither message matches the 4xx no-retry guard in main.tsx);
+ * this fires only once those retries exhaust.
+ */
+function isReachabilityError(err: unknown): err is GW2ApiError {
+  return err instanceof GW2ApiError && (err.code === 'network' || err.code === 'server');
 }
 
 /**
@@ -69,7 +82,10 @@ function HomePage() {
   const throttledQueries = isAnonymous
     ? []
     : [accountQuery, charsQuery, tokenQuery].filter((q) => isRateLimited(q.error));
-  const retryThrottled = () => {
+  // Both the throttle band and the network band re-run all three queries: they
+  // share the gw2Queue bucket, so whatever throttled or downed one downed them
+  // all, and a single retry recovers the page as a unit.
+  const refetchAll = () => {
     void accountQuery.refetch();
     void charsQuery.refetch();
     void tokenQuery.refetch();
@@ -100,9 +116,21 @@ function HomePage() {
         key={throttleKey}
         className={className}
         retryAfterSeconds={throttleSeconds}
-        onRetry={retryThrottled}
+        onRetry={refetchAll}
       />
     ) : null;
+
+  // Network/5xx failure on the page-gating queries only (account + characters).
+  // A tokeninfo-only network failure shouldn't band the page — the scope
+  // warning is non-blocking by design (piece #3), so it just doesn't render.
+  // Suppressed while throttled so a rare mixed 429+network state shows one band,
+  // not two stacked; the throttle band takes precedence and auto-recovers.
+  const networkErrored =
+    !isAnonymous &&
+    !isThrottled &&
+    (isReachabilityError(accountQuery.error) || isReachabilityError(charsQuery.error));
+  const renderNetworkBand = (className: string | undefined) =>
+    networkErrored ? <NetworkErrorBand className={className} onRetry={refetchAll} /> : null;
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -166,6 +194,14 @@ function HomePage() {
         <div className={styles.page}>{renderThrottleBand(styles.authErrorWrap)}</div>
       );
     }
+
+    // First load failed with no cached account — the network band replaces the
+    // page with a manual Retry, parallel to the throttle and loading states.
+    if (networkErrored && !account) {
+      return (
+        <div className={styles.page}>{renderNetworkBand(styles.authErrorWrap)}</div>
+      );
+    }
   }
 
   if (!account) return null;
@@ -187,6 +223,10 @@ function HomePage() {
       </header>
 
       {renderThrottleBand(styles.scopeWarnWrap)}
+
+      {/* A refresh failed while stale account data is still on screen — surface
+          the recoverable band above the content rather than replacing it. */}
+      {renderNetworkBand(styles.scopeWarnWrap)}
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>
