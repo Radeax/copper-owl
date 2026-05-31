@@ -71,17 +71,33 @@
   overflow: hidden;
 }
 
+/* Matches the real .primaryIllustration banner height (68px, 80px ≥768px) so
+   the resolved card lands where the skeleton sat. */
 .primaryIllustration {
-  height: 120px;
+  height: 68px;
   width: 100%;
   border-radius: 0;
 }
 
+@media (min-width: 768px) {
+  .primaryIllustration {
+    height: 80px;
+  }
+}
+
+/* Matches the real .primaryBody padding (18px 20px 20px, 20px 22px 22px
+   ≥768px). */
 .primaryBody {
-  padding: 16px 18px;
+  padding: 18px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 9px;
+}
+
+@media (min-width: 768px) {
+  .primaryBody {
+    padding: 20px 22px 22px;
+  }
 }
 
 .cardTitle {
@@ -100,30 +116,44 @@
 }
 
 /* ─── Alternative rows (mirrors orientation .alt) ─── */
+/* The real alt row is a full-height image strip flush to the left edge + a
+   padded content block, all clipped by the row's border-radius — not a padded
+   container with an inset square. Matching that shape keeps the resolved cards
+   from jumping when they replace the skeleton. */
 .alts {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
   margin-top: 12px;
 }
 
 .alt {
   display: flex;
-  gap: 12px;
+  align-items: stretch;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 14px;
 }
 
 .altImage {
-  width: 56px;
-  height: 56px;
+  width: 74px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-right: 1px solid var(--border-2);
+  /* Override the composed .bar radius — this is a flush strip clipped by the
+     row's overflow:hidden, not a rounded box. */
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .altImage {
+    width: 90px;
+  }
 }
 
 .altContent {
   flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
