@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { StatusBand } from './StatusBand';
 import { formatCountdown } from '@/utils/useReset';
 import styles from './RateLimitBand.module.css';
@@ -12,6 +12,10 @@ interface RateLimitBandProps {
   retryAfterSeconds: number;
   /** Called once when the countdown reaches zero — re-runs the throttled query. */
   onRetry: () => void;
+  /** Forwarded to the underlying StatusBand root — e.g. placement margins. */
+  className?: string;
+  /** Forwarded to the underlying StatusBand root. */
+  style?: CSSProperties;
 }
 
 /**
@@ -26,7 +30,7 @@ interface RateLimitBandProps {
  * on the query's errorUpdatedAt, so each fresh 429 remounts it with a clean
  * countdown. That keeps the component a pure "count down once, then fire".
  */
-export function RateLimitBand({ retryAfterSeconds, onRetry }: RateLimitBandProps) {
+export function RateLimitBand({ retryAfterSeconds, onRetry, className, style }: RateLimitBandProps) {
   const [remaining, setRemaining] = useState(retryAfterSeconds);
   const intervalRef = useRef<number | undefined>(undefined);
   const firedRef = useRef(false);
@@ -56,6 +60,8 @@ export function RateLimitBand({ retryAfterSeconds, onRetry }: RateLimitBandProps
   return (
     <StatusBand
       intent="info"
+      className={className}
+      style={style}
       action={
         // aria-hidden keeps the per-second countdown out of StatusBand's
         // role="status" live region — otherwise a screen reader re-announces

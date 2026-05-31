@@ -77,4 +77,10 @@ describe('RateLimitBand', () => {
       'Rate limit hit. The API is pacing requests. Recommendations refresh automatically.'
     );
   });
+
+  it('forwards className to the band root for placement composition', () => {
+    render(<RateLimitBand retryAfterSeconds={5} onRetry={vi.fn()} className="placement" />);
+
+    expect(screen.getByRole('status')).toHaveClass('placement');
+  });
 });

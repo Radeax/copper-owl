@@ -79,17 +79,30 @@ function HomePage() {
   // them, so counting down to the shortest would jump a longer query's window
   // before it elapsed. Re-key on the latest error so a fresh 429 restarts the
   // countdown rather than leaving it stuck at zero.
-  const throttleBand = throttledQueries.length > 0 ? (
-    <RateLimitBand
-      key={Math.max(...throttledQueries.map((q) => q.errorUpdatedAt))}
-      retryAfterSeconds={Math.max(
+  const isThrottled = throttledQueries.length > 0;
+  const throttleKey = isThrottled
+    ? Math.max(...throttledQueries.map((q) => q.errorUpdatedAt))
+    : undefined;
+  const throttleSeconds = isThrottled
+    ? Math.max(
         ...throttledQueries.map(
           (q) => (q.error as GW2ApiError).retryAfterSeconds ?? DEFAULT_RETRY_AFTER_SECONDS
         )
-      )}
-      onRetry={retryThrottled}
-    />
-  ) : null;
+      )
+    : 0;
+  // className carries the placement margin so the band composes without a
+  // wrapper div (per docs/pr-review.md §7). The two surfaces differ only in
+  // that margin: a top offset when it replaces the page, bottom space when it
+  // sits above content.
+  const renderThrottleBand = (className: string | undefined) =>
+    isThrottled ? (
+      <RateLimitBand
+        key={throttleKey}
+        className={className}
+        retryAfterSeconds={throttleSeconds}
+        onRetry={retryThrottled}
+      />
+    ) : null;
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -148,11 +161,9 @@ function HomePage() {
 
     // No cached account to fall back on — the throttle band stands in for the
     // page until the retry lands, structurally parallel to the loading state.
-    if (throttleBand && !account) {
+    if (isThrottled && !account) {
       return (
-        <div className={styles.page}>
-          <div className={styles.authErrorWrap}>{throttleBand}</div>
-        </div>
+        <div className={styles.page}>{renderThrottleBand(styles.authErrorWrap)}</div>
       );
     }
   }
@@ -175,9 +186,7 @@ function HomePage() {
         </p>
       </header>
 
-      {throttleBand && (
-        <div className={styles.scopeWarnWrap}>{throttleBand}</div>
-      )}
+      {renderThrottleBand(styles.scopeWarnWrap)}
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>
