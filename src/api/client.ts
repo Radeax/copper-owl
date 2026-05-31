@@ -31,13 +31,42 @@ const GW2_SCHEMA_VERSION = '2022-03-23T19:00:00.000Z';
 export class GW2ApiError extends Error {
   public readonly status: number;
   public readonly code: 'unauthorized' | 'forbidden' | 'rate_limited' | 'server' | 'network' | 'unknown';
+  /**
+   * Seconds to wait before retrying, parsed from the Retry-After header on a
+   * 429 response. Undefined when the header is absent or unparseable. Only
+   * meaningful on rate_limited errors; the /home countdown band reads it.
+   */
+  public readonly retryAfterSeconds?: number;
 
-  constructor(message: string, status: number, code: GW2ApiError['code']) {
+  constructor(
+    message: string,
+    status: number,
+    code: GW2ApiError['code'],
+    retryAfterSeconds?: number
+  ) {
     super(message);
     this.name = 'GW2ApiError';
     this.status = status;
     this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
+}
+
+/**
+ * Parse a Retry-After header value into seconds. ArenaNet returns the
+ * delta-seconds form (e.g. "30"), which is all we handle here. The RFC also
+ * permits an HTTP-date form; GW2 doesn't use it, so it's intentionally left
+ * unparsed (returns undefined) rather than adding date math we'd never exercise.
+ *
+ * delta-seconds is 1*DIGIT — a non-negative integer. We match that exactly
+ * rather than lean on Number(), which would also accept scientific ("1e3"),
+ * hex ("0x10"), signed, and fractional forms; a header in any of those shapes
+ * is malformed and should fall back to the caller's default, not be trusted.
+ */
+function parseRetryAfter(raw: string | null): number | undefined {
+  if (!raw || !/^\d+$/.test(raw.trim())) return undefined;
+  const seconds = Number(raw.trim());
+  return Number.isFinite(seconds) ? seconds : undefined;
 }
 
 export interface FetchOptions {
@@ -106,10 +135,17 @@ export async function gw2Fetch<T = unknown>(
     } catch {
       // Body wasn't JSON — ignore, use statusText
     }
+    // Retry-After is only meaningful on a throttle; read it only there so
+    // unrelated error paths never touch the header.
+    const retryAfterSeconds =
+      code === 'rate_limited'
+        ? parseRetryAfter(response.headers.get('Retry-After'))
+        : undefined;
     throw new GW2ApiError(
       `GW2 API ${response.status}: ${detail}`,
       response.status,
-      code
+      code,
+      retryAfterSeconds
     );
   }
 

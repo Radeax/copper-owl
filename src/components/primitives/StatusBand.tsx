@@ -1,8 +1,12 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import styles from './StatusBand.module.css';
 
 interface StatusBandProps {
   children: ReactNode;
+  /** Extra class(es) merged onto the band root — e.g. placement margins from the route. */
+  className?: string;
+  /** Inline style merged onto the band root. Prefer className; here for composition parity. */
+  style?: CSSProperties;
   /**
    * Optional eyebrow label rendered above the body text in uppercase. Mirrors
    * the recommendation-card eyebrow pattern so status surfaces read as peers
@@ -35,9 +39,20 @@ interface StatusBandProps {
  * than replacing the page with it. The auth-error path replaces because that
  * state has nothing else meaningful to show.
  */
-export function StatusBand({ children, label, action, intent = 'info' }: StatusBandProps) {
+export function StatusBand({
+  children,
+  label,
+  action,
+  intent = 'info',
+  className,
+  style,
+}: StatusBandProps) {
   return (
-    <div className={`${styles.band} ${styles[intent]}`} role="status">
+    <div
+      className={`${styles.band} ${styles[intent]}${className ? ` ${className}` : ''}`}
+      style={style}
+      role="status"
+    >
       {label && <p className={styles.label}>{label}</p>}
       <p className={styles.text}>{children}</p>
       {action && <div className={styles.action}>{action}</div>}

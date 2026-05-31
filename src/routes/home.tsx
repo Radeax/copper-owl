@@ -5,6 +5,7 @@ import { useReset } from '@/utils/useReset';
 import { RecommendationCard } from '@/components/cards/RecommendationCard';
 import { ResetClock } from '@/components/cards/ResetClock';
 import { StatusBand } from '@/components/primitives/StatusBand';
+import { RateLimitBand } from '@/components/primitives/RateLimitBand';
 import { useAuthStore, buildSyntheticAccountState } from '@/state/auth';
 import { useGW2Account, useGW2Characters, useGW2TokenInfo } from '@/api/gw2';
 import { GW2ApiError } from '@/api/client';
@@ -22,6 +23,18 @@ function isAuthError(err: unknown): boolean {
     (err.code === 'unauthorized' || err.code === 'forbidden')
   );
 }
+
+function isRateLimited(err: unknown): err is GW2ApiError {
+  return err instanceof GW2ApiError && err.code === 'rate_limited';
+}
+
+/**
+ * Fallback countdown when a 429 arrives without a Retry-After header — GW2's
+ * rate-limit window is roughly per-minute, so 60s is a safe automatic retry
+ * delay. The gw2Queue already paces requests, so an over-long wait here only
+ * delays the refetch; it never causes a second throttle.
+ */
+const DEFAULT_RETRY_AFTER_SECONDS = 60;
 
 function HomePage() {
   const navigate = useNavigate();
@@ -50,6 +63,46 @@ function HomePage() {
     () => (tokenQuery.data ? missingScopes(tokenQuery.data.permissions) : []),
     [tokenQuery.data]
   );
+
+  // Every mounted query currently holding a 429. They share one rate-limit
+  // bucket (the gw2Queue), so a throttle usually hits all three at once.
+  const throttledQueries = isAnonymous
+    ? []
+    : [accountQuery, charsQuery, tokenQuery].filter((q) => isRateLimited(q.error));
+  const retryThrottled = () => {
+    void accountQuery.refetch();
+    void charsQuery.refetch();
+    void tokenQuery.refetch();
+  };
+
+  // Seed from the *longest* active Retry-After: retryThrottled refetches all of
+  // them, so counting down to the shortest would jump a longer query's window
+  // before it elapsed. Re-key on the latest error so a fresh 429 restarts the
+  // countdown rather than leaving it stuck at zero.
+  const isThrottled = throttledQueries.length > 0;
+  const throttleKey = isThrottled
+    ? Math.max(...throttledQueries.map((q) => q.errorUpdatedAt))
+    : undefined;
+  const throttleSeconds = isThrottled
+    ? Math.max(
+        ...throttledQueries.map(
+          (q) => (q.error as GW2ApiError).retryAfterSeconds ?? DEFAULT_RETRY_AFTER_SECONDS
+        )
+      )
+    : 0;
+  // className carries the placement margin so the band composes without a
+  // wrapper div (per docs/pr-review.md §7). The two surfaces differ only in
+  // that margin: a top offset when it replaces the page, bottom space when it
+  // sits above content.
+  const renderThrottleBand = (className: string | undefined) =>
+    isThrottled ? (
+      <RateLimitBand
+        key={throttleKey}
+        className={className}
+        retryAfterSeconds={throttleSeconds}
+        onRetry={retryThrottled}
+      />
+    ) : null;
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -105,6 +158,14 @@ function HomePage() {
         </div>
       );
     }
+
+    // No cached account to fall back on — the throttle band stands in for the
+    // page until the retry lands, structurally parallel to the loading state.
+    if (isThrottled && !account) {
+      return (
+        <div className={styles.page}>{renderThrottleBand(styles.authErrorWrap)}</div>
+      );
+    }
   }
 
   if (!account) return null;
@@ -124,6 +185,8 @@ function HomePage() {
           <span className={styles.archetype}>{archetype.replace(/_/g, ' ')}</span>
         </p>
       </header>
+
+      {renderThrottleBand(styles.scopeWarnWrap)}
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>

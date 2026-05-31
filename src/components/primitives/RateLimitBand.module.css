@@ -1,0 +1,8 @@
+/* Live countdown in the band's action slot. Reads as quiet informational
+   text, not an interactive action — muted, tabular figures so the seconds
+   don't shift width as they tick. */
+.countdown {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
