@@ -32,14 +32,22 @@ function isRateLimited(err: unknown): err is GW2ApiError {
 
 /**
  * A failure where the data the page needs didn't arrive but retrying might fix
- * it: a rejected fetch (offline, DNS, timeout → code 'network') or a GW2 5xx
- * (code 'server'). Distinct from 429 (transient, self-resolving — RateLimitBand)
- * and auth (401/403 — a bad key, retrying won't help). TanStack Query retries
- * both up to twice (neither message matches the 4xx no-retry guard in main.tsx);
- * this fires only once those retries exhaust.
+ * it: a rejected fetch (offline, DNS, timeout → code 'network'), a GW2 5xx
+ * (code 'server'), or an unexpected non-auth, non-429 status (code 'unknown' —
+ * e.g. a stray 4xx these endpoints don't normally return). Distinct from 429
+ * (transient, self-resolving — RateLimitBand) and auth (401/403 — a bad key,
+ * retrying won't help).
+ *
+ * 'unknown' is folded in so it surfaces a recoverable band with a Retry rather
+ * than falling through to a blank page (#29). TanStack Query retries network/5xx
+ * up to twice before this fires; a 4xx 'unknown' isn't retried, so it fires at
+ * once.
  */
-function isReachabilityError(err: unknown): err is GW2ApiError {
-  return err instanceof GW2ApiError && (err.code === 'network' || err.code === 'server');
+function isRecoverableLoadError(err: unknown): err is GW2ApiError {
+  return (
+    err instanceof GW2ApiError &&
+    (err.code === 'network' || err.code === 'server' || err.code === 'unknown')
+  );
 }
 
 /**
@@ -121,17 +129,18 @@ function HomePage() {
       />
     ) : null;
 
-  // Network/5xx failure on the page-gating queries only (account + characters).
-  // A tokeninfo-only network failure shouldn't band the page — the scope
+  // A recoverable load failure on the page-gating queries only (account +
+  // characters): an unreachable/down API (network/5xx) or an unexpected status
+  // (unknown). A tokeninfo-only failure shouldn't band the page — the scope
   // warning is non-blocking by design (piece #3), so it just doesn't render.
-  // Suppressed while throttled so a rare mixed 429+network state shows one band,
+  // Suppressed while throttled so a rare mixed 429+failure state shows one band,
   // not two stacked; the throttle band takes precedence and auto-recovers.
-  const networkErrored =
+  const loadErrored =
     !isAnonymous &&
     !isThrottled &&
-    (isReachabilityError(accountQuery.error) || isReachabilityError(charsQuery.error));
+    (isRecoverableLoadError(accountQuery.error) || isRecoverableLoadError(charsQuery.error));
   const renderNetworkBand = (className: string | undefined) =>
-    networkErrored ? <NetworkErrorBand className={className} onRetry={refetchAll} /> : null;
+    loadErrored ? <NetworkErrorBand className={className} onRetry={refetchAll} /> : null;
 
   const account = useMemo(() => {
     if (isAnonymous && anonymousProfile) {
@@ -194,9 +203,9 @@ function HomePage() {
       );
     }
 
-    // First load failed with no cached account — the network band replaces the
-    // page with a manual Retry, parallel to the throttle and loading states.
-    if (networkErrored && !account) {
+    // First load failed with no cached account — the recoverable band replaces
+    // the page with a manual Retry, parallel to the throttle and loading states.
+    if (loadErrored && !account) {
       return (
         <div className={styles.page}>{renderNetworkBand(styles.authErrorWrap)}</div>
       );

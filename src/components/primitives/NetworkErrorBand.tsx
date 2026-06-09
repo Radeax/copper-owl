@@ -12,8 +12,12 @@ interface NetworkErrorBandProps {
 }
 
 /**
- * The network/5xx failure surface on /home — the third StatusBand consumer
- * after the scope warning and the 429 countdown.
+ * The recoverable load-failure surface on /home — the third StatusBand consumer
+ * after the scope warning and the 429 countdown. Covers a rejected fetch
+ * (network), a GW2 5xx (server), and an unexpected non-auth status (unknown,
+ * e.g. a stray 4xx) — see isRecoverableLoadError in home.tsx. The copy speaks to
+ * the common network/5xx case; the unknown path is rare enough on these
+ * endpoints to reuse it rather than split the component.
  *
  * intent="error": unlike the 429 (a transient throttle that self-resolves on a
  * timer), an unreachable API or a 5xx is a genuine failure the user must act on
