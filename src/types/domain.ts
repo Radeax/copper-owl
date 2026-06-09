@@ -113,13 +113,13 @@ export interface SourceCitation {
 }
 
 // ─── Reset cycle ─────────────────────────────────────────────────────
-// GW2 daily reset is at 16:00 UTC. Weekly reset is Monday 16:00 UTC.
+// GW2 daily reset is at 00:00 UTC. Weekly reset is Monday 07:30 UTC.
 // Reset-awareness is a first-class concept in Copper Owl's design.
 
 export interface ResetState {
   /** Seconds until next daily reset */
   secondsToDailyReset: number;
-  /** Seconds until next weekly reset (Monday 16:00 UTC) */
+  /** Seconds until next weekly reset (Monday 07:30 UTC) */
   secondsToWeeklyReset: number;
   /** True if daily reset is within 30 minutes */
   resetImminent: boolean;
