@@ -5,7 +5,7 @@
 ## Core principles
 
 1. **Pure engine, framework-free.** The recommendation engine (`src/engine/`) is plain TypeScript with no React, no I/O, no side effects. `recommend({account, reset})` → `{archetype, recommendations[]}`. Trivially testable, runs identically across all build targets.
-2. **Reset-awareness is first-class.** GW2's daily reset (16:00 UTC) and weekly reset (Monday 16:00 UTC) shape recommendations directly. The engine takes the current `ResetState` as input alongside account state.
+2. **Reset-awareness is first-class.** GW2's daily reset (00:00 UTC) and weekly reset (Monday 07:30 UTC) shape recommendations directly. The engine takes the current `ResetState` as input alongside account state.
 3. **One unified Session.** The three access modes (anonymous / API key / gw2.me OAuth) all produce the same `Session` shape. The UI and engine never branch on mode.
 4. **No backend.** The web app calls the public GW2 API directly. If a backend is ever needed, Cloudflare Workers is the natural fit (we're already on Cloudflare Pages).
 5. **Web-first, Tauri for native.** Same React codebase ships to browser, desktop, iOS, and Android via Tauri 2. No UI duplication.

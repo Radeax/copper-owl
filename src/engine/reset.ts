@@ -1,9 +1,12 @@
 /**
  * Reset clock — computes seconds-until-reset for daily and weekly GW2 resets.
  *
- * GW2 reset times (canonical):
- *   - Daily reset: 16:00 UTC every day (8am PT / 11am ET / 5pm CET / midnight JST)
- *   - Weekly reset: Monday 16:00 UTC
+ * GW2 reset times (canonical, per https://wiki.guildwars2.com/wiki/Server_reset):
+ *   - Daily reset: 00:00 UTC every day
+ *   - Weekly reset: Monday 07:30 UTC
+ *
+ * The weekly reset is a different time-of-day than the daily reset (07:30 vs
+ * 00:00), so it's computed independently rather than rolled off the daily.
  *
  * Reset-awareness is a first-class concept: recommendations should know how
  * close to reset we are. Voice principle: never use "tonight" — use "this
@@ -12,13 +15,15 @@
 
 import type { ResetState } from '@/types/domain';
 
-const DAILY_RESET_HOUR_UTC = 16;
+const DAILY_RESET_HOUR_UTC = 0;
 const WEEKLY_RESET_DOW = 1; // Monday (0 = Sunday in JS Date)
+const WEEKLY_RESET_HOUR_UTC = 7;
+const WEEKLY_RESET_MINUTE_UTC = 30;
 
 /**
- * Returns the next daily reset as a Date in UTC.
- * If current UTC time is before 16:00 today, that's the next reset.
- * Otherwise it's 16:00 UTC tomorrow.
+ * Returns the next daily reset (00:00 UTC) as a Date in UTC. Always the next
+ * UTC midnight: if today's 00:00 has already passed (it almost always has),
+ * that's tomorrow's.
  */
 export function nextDailyReset(now: Date = new Date()): Date {
   const next = new Date(
@@ -39,12 +44,24 @@ export function nextDailyReset(now: Date = new Date()): Date {
 }
 
 /**
- * Returns the next weekly reset (Monday 16:00 UTC) as a Date in UTC.
+ * Returns the next weekly reset (Monday 07:30 UTC) as a Date in UTC. Computed
+ * from its own time-of-day, not nextDailyReset, since the two differ.
  */
 export function nextWeeklyReset(now: Date = new Date()): Date {
-  const next = nextDailyReset(now);
-  // Roll forward day-by-day until we land on Monday
-  while (next.getUTCDay() !== WEEKLY_RESET_DOW) {
+  const next = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      WEEKLY_RESET_HOUR_UTC,
+      WEEKLY_RESET_MINUTE_UTC,
+      0,
+      0
+    )
+  );
+  // Advance day-by-day until we land on a Monday strictly in the future. The
+  // setUTCDate steps preserve the 07:30 time-of-day.
+  while (next.getUTCDay() !== WEEKLY_RESET_DOW || next.getTime() <= now.getTime()) {
     next.setUTCDate(next.getUTCDate() + 1);
   }
   return next;
