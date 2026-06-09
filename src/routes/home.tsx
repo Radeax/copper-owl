@@ -40,8 +40,8 @@ function isRateLimited(err: unknown): err is GW2ApiError {
  *
  * 'unknown' is folded in so it surfaces a recoverable band with a Retry rather
  * than falling through to a blank page (#29). TanStack Query retries network/5xx
- * up to twice before this fires; a 4xx 'unknown' isn't retried, so it fires at
- * once.
+ * up to twice before this fires; a 4xx 'unknown' isn't retried, so the band
+ * surfaces immediately.
  */
 function isRecoverableLoadError(err: unknown): err is GW2ApiError {
   return (
