@@ -1,8 +1,8 @@
 # API fixtures
 
-Anonymized real GW2 API responses captured against the author's account. Intended for regression coverage of the engaged_committed archetype classification path in `transform.test.ts`.
+Anonymized real GW2 API responses captured against the author's account (a committed WvW player). Used for regression coverage of the engaged archetype path in `transform.test.ts`: the API-derived default is `engaged_casual` (since `pursuingGoal` can't be derived from the API), and the `engaged_committed` path is exercised by forcing `pursuingGoal=true`.
 
-**Status:** the fixtures themselves land in PRD 0003 Phase 1 (this commit). The tests that consume them are deferred to Phase 2 — until then, `transform.test.ts` still runs against synthetic data only.
+**Status:** consumed by `transform.test.ts` since PRD 0003 Phase 2. The fixtures back the engaged-account round-trip, classifier, and PoF-implies-HoT assertions; synthetic data still covers the other archetypes' classifier edge cases.
 
 ## Files
 
