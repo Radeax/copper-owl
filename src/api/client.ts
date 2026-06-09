@@ -159,3 +159,22 @@ function errorCodeForStatus(status: number): GW2ApiError['code'] {
   if (status >= 500) return 'server';
   return 'unknown';
 }
+
+/**
+ * TanStack Query retry predicate. Retries transient failures — a rejected fetch
+ * (GW2ApiError.status 0) and 5xx — up to two times. Never retries a 4xx: those
+ * are auth/permission/bad-request errors that won't succeed on a blind retry,
+ * plus 429, which the /home countdown band retries on its own paced schedule.
+ *
+ * Reads the typed GW2ApiError.status rather than regex-matching the error
+ * message. The old `/4\d{2}/.test(error.message)` predicate would misclassify a
+ * 5xx whose detail string happened to contain a 4xx-looking number
+ * (e.g. "GW2 API 500: upstream 404 …") as non-retryable. The status field is
+ * authoritative; the message is not (#28).
+ */
+export function shouldRetryQuery(failureCount: number, error: unknown): boolean {
+  if (error instanceof GW2ApiError && error.status >= 400 && error.status < 500) {
+    return false;
+  }
+  return failureCount < 2;
+}
