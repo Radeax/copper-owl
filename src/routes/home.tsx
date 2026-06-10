@@ -139,7 +139,7 @@ function HomePage() {
     !isAnonymous &&
     !isThrottled &&
     (isRecoverableLoadError(accountQuery.error) || isRecoverableLoadError(charsQuery.error));
-  const renderNetworkBand = (className: string | undefined) =>
+  const renderRecoverableBand = (className: string | undefined) =>
     loadErrored ? <NetworkErrorBand className={className} onRetry={refetchAll} /> : null;
 
   const account = useMemo(() => {
@@ -207,7 +207,7 @@ function HomePage() {
     // the page with a manual Retry, parallel to the throttle and loading states.
     if (loadErrored && !account) {
       return (
-        <div className={styles.page}>{renderNetworkBand(styles.authErrorWrap)}</div>
+        <div className={styles.page}>{renderRecoverableBand(styles.authErrorWrap)}</div>
       );
     }
   }
@@ -234,7 +234,7 @@ function HomePage() {
 
       {/* A refresh failed while stale account data is still on screen — surface
           the recoverable band above the content rather than replacing it. */}
-      {renderNetworkBand(styles.scopeWarnWrap)}
+      {renderRecoverableBand(styles.scopeWarnWrap)}
 
       {!isAnonymous && missing.length > 0 && (
         <div className={styles.scopeWarnWrap}>
