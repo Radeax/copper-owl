@@ -249,8 +249,17 @@ describe('gw2Fetch — error classification', () => {
  */
 describe('shouldRetryQuery', () => {
   it('does not retry any 4xx (auth, permission, bad request, rate-limit)', () => {
-    for (const status of [400, 401, 403, 404, 429]) {
-      const err = new GW2ApiError(`GW2 API ${status}`, status, 'unknown');
+    // Realistic status→code pairs, matching errorCodeForStatus, so the intent
+    // reads clearly even though shouldRetryQuery keys on status, not code.
+    const cases: Array<[number, GW2ApiError['code']]> = [
+      [400, 'unknown'],
+      [401, 'unauthorized'],
+      [403, 'forbidden'],
+      [404, 'unknown'],
+      [429, 'rate_limited'],
+    ];
+    for (const [status, code] of cases) {
+      const err = new GW2ApiError(`GW2 API ${status}`, status, code);
       expect(shouldRetryQuery(0, err)).toBe(false);
     }
   });
@@ -271,7 +280,11 @@ describe('shouldRetryQuery', () => {
     expect(shouldRetryQuery(0, err)).toBe(true);
   });
 
-  it('retries non-GW2ApiError errors up to twice (unchanged fallback)', () => {
+  it('retries non-GW2ApiError errors up to twice', () => {
+    // A behavior change from the old predicate: it applied /4\d{2}/ to ANY
+    // Error's message, so a non-GW2ApiError whose message contained a 4xx-looking
+    // number would not retry. Now only the typed status gates retries, so an
+    // unexpected throw always retries — its message is never inspected.
     const err = new Error('boom');
     expect(shouldRetryQuery(0, err)).toBe(true);
     expect(shouldRetryQuery(2, err)).toBe(false);

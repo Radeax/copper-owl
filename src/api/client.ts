@@ -162,9 +162,12 @@ function errorCodeForStatus(status: number): GW2ApiError['code'] {
 
 /**
  * TanStack Query retry predicate. Retries transient failures — a rejected fetch
- * (GW2ApiError.status 0) and 5xx — up to two times. Never retries a 4xx: those
- * are auth/permission/bad-request errors that won't succeed on a blind retry,
- * plus 429, which the /home countdown band retries on its own paced schedule.
+ * (GW2ApiError.status 0) and 5xx — up to two times. Never retries a GW2ApiError
+ * 4xx: those are auth/permission/bad-request errors that won't succeed on a
+ * blind retry, plus 429, which the /home countdown band retries on its own paced
+ * schedule. An error that isn't a GW2ApiError (an unexpected throw) falls through
+ * to the same up-to-twice retry as transient failures — its message is never
+ * inspected.
  *
  * Reads the typed GW2ApiError.status rather than regex-matching the error
  * message. The old `/4\d{2}/.test(error.message)` predicate would misclassify a
