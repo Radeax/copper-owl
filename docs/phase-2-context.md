@@ -1,10 +1,10 @@
 # PRD 0003 Phase 2 — Implementation kickoff context
 
-> Last updated: May 2026, post-PR-#11 merge
-> Status: in progress — piece #2 (fixtures + null-guard) merged via PR #11; piece #1 (CORS fix) queued next
-> Branch: one branch per piece off `main` (Phase 1 + piece #2 already merged there)
+> Last updated: June 2026, post-Phase-2 completion
+> Status: COMPLETE — all of Phase 2 shipped (pieces #1–#7); PRD 0003 flipped to Implemented (PR #32); Milestone 1 closed. Kept as a historical record of the Phase 2 sequencing.
+> Branch: one branch per piece off `main` (all merged)
 
-This doc captures the working context for closing the remaining PRD 0003 work. Read it before starting any Phase 2 commits. It's a snapshot of decisions made during Phase 1 design discussions that aren't all captured in code or PRDs yet.
+This doc captured the working context for closing PRD 0003 and is now a historical record of how Phase 2 was sequenced. The canonical shipped state is the PRD itself (`docs/product/0003-real-api-key-integration.md`, status: Implemented). The "remaining" / "pending" framing below describes work that is now done — read it as history, not a to-do list.
 
 ## What's already done
 
