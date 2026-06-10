@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { gw2Fetch, GW2ApiError } from './client';
+import { gw2Fetch, GW2ApiError, shouldRetryQuery } from './client';
 
 /**
  * These tests pin the CORS contract documented above gw2Fetch in client.ts:
@@ -239,5 +239,54 @@ describe('gw2Fetch — error classification', () => {
 
     expect(err.code).toBe(code);
     expect(err.status).toBe(status);
+  });
+});
+
+/**
+ * shouldRetryQuery is the TanStack Query retry predicate. It reads the typed
+ * GW2ApiError.status, not the message, so a 4xx-looking number inside a 5xx
+ * message can't flip retryability (#28).
+ */
+describe('shouldRetryQuery', () => {
+  it('does not retry any 4xx (auth, permission, bad request, rate-limit)', () => {
+    // Realistic status→code pairs, matching errorCodeForStatus, so the intent
+    // reads clearly even though shouldRetryQuery keys on status, not code.
+    const cases: Array<[number, GW2ApiError['code']]> = [
+      [400, 'unknown'],
+      [401, 'unauthorized'],
+      [403, 'forbidden'],
+      [404, 'unknown'],
+      [429, 'rate_limited'],
+    ];
+    for (const [status, code] of cases) {
+      const err = new GW2ApiError(`GW2 API ${status}`, status, code);
+      expect(shouldRetryQuery(0, err)).toBe(false);
+    }
+  });
+
+  it('retries a rejected fetch (status 0) and 5xx, up to twice', () => {
+    const network = new GW2ApiError('Network error fetching /v2/account', 0, 'network');
+    const server = new GW2ApiError('GW2 API 503', 503, 'server');
+
+    expect(shouldRetryQuery(0, network)).toBe(true);
+    expect(shouldRetryQuery(1, network)).toBe(true);
+    expect(shouldRetryQuery(2, network)).toBe(false); // retries exhausted
+    expect(shouldRetryQuery(0, server)).toBe(true);
+  });
+
+  it('retries a 5xx even when its message contains a 4xx-looking number', () => {
+    // The old /4\d{2}/.test(error.message) predicate would wrongly skip this.
+    const err = new GW2ApiError('GW2 API 500: upstream 404 from origin', 500, 'server');
+    expect(shouldRetryQuery(0, err)).toBe(true);
+  });
+
+  it('retries non-GW2ApiError errors up to twice', () => {
+    // A behavior change from the old predicate: it applied /4\d{2}/ to ANY
+    // Error's message, so a non-GW2ApiError whose message contained a 4xx-looking
+    // number would not retry. Now only the typed status gates retries, so an
+    // unexpected throw always retries — its message is never inspected.
+    const err = new Error('boom');
+    expect(shouldRetryQuery(0, err)).toBe(true);
+    expect(shouldRetryQuery(2, err)).toBe(false);
   });
 });

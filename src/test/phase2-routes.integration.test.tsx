@@ -228,6 +228,23 @@ describe('Phase 2 routes — /home status bands', () => {
     expect(await screen.findByText(/TestAccount\.1234/)).toBeInTheDocument();
   });
 
+  it('surfaces the recoverable band on an unexpected 4xx instead of a blank page (#29)', async () => {
+    // A non-auth, non-429 status (e.g. 404 → code 'unknown') used to fall
+    // through to `if (!account) return null` — a blank page. It now shows the
+    // recoverable band, like network/5xx.
+    installFetch((path) => {
+      if (path === '/v2/account' || path === '/v2/characters') {
+        return res({ status: 404, body: { text: 'not found' } });
+      }
+      return res({ body: tokeninfoFull });
+    });
+    seedApiKeySession();
+    renderAt('/home');
+
+    expect(await screen.findByText(/return account data/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
   it('surfaces the scope warning when progression is missing (piece #3)', async () => {
     installFetch(successHandler(tokeninfoMissingProgression));
     seedApiKeySession();

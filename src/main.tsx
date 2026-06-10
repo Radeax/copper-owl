@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { routeTree } from './routeTree.gen';
+import { shouldRetryQuery } from './api/client';
 import './styles/tokens.css';
 
 // Bootstrap rule registry. The example placeholder rules always register
@@ -34,11 +35,7 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
       gcTime: 1000 * 60 * 30, // 30 minutes
-      retry: (failureCount, error) => {
-        // Don't retry 4xx errors (auth/permission issues)
-        if (error instanceof Error && /4\d{2}/.test(error.message)) return false;
-        return failureCount < 2;
-      },
+      retry: shouldRetryQuery,
       refetchOnWindowFocus: false,
     },
   },
